@@ -1,0 +1,27 @@
+{% extends 'otree/WaitPage.html' %}
+{% load staticfiles otree_tags %}
+{% block title %}Please wait!{% endblock %}
+{% block styles %}
+<style>
+#left_to_wait{font-weight:bold;}
+</style>
+{% endblock %}
+{% block content %}
+
+    {{ body_text }}
+  <div><b><span id="how_many_arrived"></span>/{{Constants.players_per_group}}</b> participants are
+     already here... </div>
+  <div>Waiting for <span id="left_to_wait"></span> more <span id="left_to_wait_people"></span>... </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+{% include 'customwp/waiting_page_channel.js.html' %}
+
+</script>
+
+<script>
+
+</script>
+{% endblock %}

@@ -1,0 +1,38 @@
+<script>
+window.onload = function() {
+  var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+  var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/first_wp/{{subsession.id}},{{view.index_in_pages}},{{player.pk}}");
+
+  // Handle any errors that occur.
+  wpsocket.onerror = function(error) {
+    console.log('WebSocket Error: ' + error);
+  };
+
+  // Show a connected message when the WebSocket is opened.
+  wpsocket.onopen = function(event) {
+    console.log('connected to oTree');
+  };
+
+
+  // Handle messages sent by the server.
+  wpsocket.onmessage = function(event) {
+    var obj = jQuery.parseJSON(event.data);
+    console.log(obj)
+    left_to_wait = obj.left_to_wait;
+    how_many_arrived = obj.how_many_arrived;
+    $('#left_to_wait').html(left_to_wait);
+    var people = left_to_wait != 1 ? 'participants' : 'participant'
+    $('#left_to_wait_people').html(people);
+    $('#how_many_arrived').html(how_many_arrived);
+    people = how_many_arrived != 1 ? 's are' : ' is'
+    $('#how_many_arrived_people').html(people);
+  };
+
+
+  // Show a disconnected message when the WebSocket is closed.
+  wpsocket.onclose = function(event) {
+    console.log('disconnected from oTree');
+  };
+};
+
+</script>

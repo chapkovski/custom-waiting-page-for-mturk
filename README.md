@@ -1,6 +1,6 @@
 # Custom waiting pages in oTree
 
-##Custom first and other waiting pages for mTurk - allowing users to finish the game when they wait too long
+## Custom first and other waiting pages for mTurk - allowing users to finish the game when they wait too long
 
 The task of this code is to guarantee that players in online experiments won't
 get stuck at the initial stage of the game while waiting for other participants.

@@ -99,10 +99,7 @@ ROOMS = [
     #     'display_name': 'Econ 101 class',
     #     'participant_label_file': '_rooms/econ101.txt',
     # },
-    {
-        'name': 'uzh',
-        'display_name': 'Room for Social Norms class',
-    },
+
 ]
 
 
@@ -164,5 +161,3 @@ SESSION_CONFIGS = [
 # }]
 # print(TEMPLATES)
 otree.settings.augment_settings(globals())
-# from  otree.views.demo import DemoIndex
-# DemoIndex.template_name = 'new_demo_index.html'

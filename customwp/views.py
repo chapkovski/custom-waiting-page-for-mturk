@@ -37,9 +37,6 @@ class StartWP(CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
 
-    def get_mturk_group_name(self):
-        return 'mturkchannel_{}_{}'.format(self.session.pk, self._index_in_pages)
-
     def is_displayed(self):
         return self.subsession.round_number == 1
 
@@ -57,7 +54,6 @@ class StartWP(CustomWaitPage):
         if endofgame:
             self.player.outofthegame = True
             return [self.player]
-        print("HOW MAMMMMAMANY????", len(waiting_players))
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players
 

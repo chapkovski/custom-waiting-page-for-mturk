@@ -52,8 +52,9 @@ class StartWP(CustomWaitPage):
         post_dict = self.request.POST.dict()
         endofgame = post_dict.get('endofgame')
         if endofgame:
-            self.player.outofthegame = True
-            return [self.player]
+            curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
+            curplayer.outofthegame = True
+            return [curplayer]
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players
 

@@ -20,7 +20,7 @@
     <form action="" method="post" role="form" class="form">
     {% csrf_token %}
     <div>
-     <button class="btn btn-primary" id='finish_study' style="display:none;" name="endofgame" value="True">
+     <button class="btn btn-primary" id='finish_study' style="display:none;" name="endofgame" value="{{player.pk}}">
        Finish study
      </button>
     </div><br>

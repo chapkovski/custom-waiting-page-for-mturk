@@ -34,7 +34,7 @@
     {% csrf_token %}
     <div>
      <button class="btn btn-primary" id='finish_study' style="display:    {% if subsession.not_enough_players %}inline{% else %}none{% endif %};" name="endofgame" value="{{player.pk}}">
-       Finish study
+       Finish the study
      </button>
     </div><br>
     </form>

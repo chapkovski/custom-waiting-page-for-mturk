@@ -51,22 +51,14 @@ class StartWP(CustomWaitPage):
     def get_players_for_group(self, waiting_players):
         post_dict = self.request.POST.dict()
         endofgame = post_dict.get('endofgame')
+        slowpokes = [p.participant for p in self.subsession.get_players()
+                     if p.participant._index_in_pages
+                     <= self.index_in_pages]
+        if len(slowpokes) <= Constants.players_per_group:
+            self.subsession.not_enough_players = True
         if endofgame:
             curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
             curplayer.outofthegame = True
-            slowpokes = [p.participant for p in self.subsession.get_players()
-                         if p.participant._index_in_pages
-                         <= self.index_in_pages and p != curplayer]
-            if len(slowpokes) < Constants.players_per_group:
-                self.subsession.not_enough_players = True
-                # textforgroup = json.dumps({
-                #                             "LastPlayers": True,
-                #                             })
-                # channels.Group(get_group_name(self.subsession.pk,
-                #                               self.index_in_pages,
-                #                               curplayer.pk)).send({
-                #                                     "text": textforgroup,
-                #                               })
             return [curplayer]
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players

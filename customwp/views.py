@@ -18,7 +18,7 @@ from otree.models_concrete import (
 import time
 import channels
 import json
-
+from .consumers import get_group_name
 
 class CustomWaitPage(WaitPage):
     template_name = 'customwp/CustomWaitPage.html'
@@ -54,6 +54,19 @@ class StartWP(CustomWaitPage):
         if endofgame:
             curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
             curplayer.outofthegame = True
+            slowpokes = [p.participant for p in self.subsession.get_players()
+                         if p.participant._index_in_pages
+                         <= self.index_in_pages and p != curplayer]
+            if len(slowpokes) < Constants.players_per_group:
+                self.subsession.not_enough_players = True
+                # textforgroup = json.dumps({
+                #                             "LastPlayers": True,
+                #                             })
+                # channels.Group(get_group_name(self.subsession.pk,
+                #                               self.index_in_pages,
+                #                               curplayer.pk)).send({
+                #                                     "text": textforgroup,
+                #                               })
             return [curplayer]
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players

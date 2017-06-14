@@ -17,7 +17,7 @@ def get_group_name(subsession_pk, index_in_pages, player_pk):
     return group_name
 
 
-def send_message(message, subsession, index_in_pages, player_pk):
+def send_message(message, subsession, index_in_pages, player_pk, ):
     curplayer = Player.objects.get(pk=player_pk)
     url = curplayer.participant._url_i_should_be_on()
     Page = get_view_from_url(url)
@@ -55,8 +55,12 @@ def ws_connect(message, subsession, index_in_pages, player_pk):
     send_message(message, subsession, index_in_pages, player_pk)
 
 
-def ws_message(message):
+def ws_message(message, subsession, index_in_pages, player_pk):
     ...
+    # textforgroup = json.dumps({"LastPlayers": True, })
+    # Group(get_group_name(subsession, index_in_pages, player_pk)).send({
+    #     "text": textforgroup,
+    # })
 
 
 # Connected to websocket.disconnect

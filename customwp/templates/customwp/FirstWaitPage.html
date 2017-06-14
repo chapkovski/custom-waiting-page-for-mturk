@@ -8,6 +8,19 @@
 {% endblock %}
 {% block content %}
     {{block.super}}
+    {% if subsession.not_enough_players %}
+
+      <div id="not_enough_players" class="alert alert-danger" role="alert">
+        Unfortunately, one of the other partipants has left. Now
+        there is no enough participants left to complete the study.
+        <br>
+        Please, click 'Finish the study'.
+        <br>
+        <b>You are still eligible for the participation fee!</b>
+        <br>
+        We apologise for the inconvenience.
+      </div>
+    {% else %}
     <div id="otree-timeout" class="alert alert-warning" style="display:block;">
         <p>You can finish the study if nobody arrives in:
             <span style="font-weight: bold">
@@ -16,11 +29,11 @@
             </span>
         </p>
     </div>
-
+    {% endif %}
     <form action="" method="post" role="form" class="form">
     {% csrf_token %}
     <div>
-     <button class="btn btn-primary" id='finish_study' style="display:none;" name="endofgame" value="{{player.pk}}">
+     <button class="btn btn-primary" id='finish_study' style="display:    {% if subsession.not_enough_players %}inline{% else %}none{% endif %};" name="endofgame" value="{{player.pk}}">
        Finish study
      </button>
     </div><br>
@@ -41,7 +54,7 @@
                 switch(event.type) {
                     case "seconds":
                         $(this).find('span#seconds').html(event.value);
-                        console.log(event.value);
+
                         break;
                     case "minutes":
                         $(this).find('span#minutes').html(event.lasting.hours * 60 + parseInt(event.value));
@@ -54,6 +67,10 @@
                 }
             });
         });
+
+
+
+
     </script>
 
 {% endblock %}

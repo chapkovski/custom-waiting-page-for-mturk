@@ -23,7 +23,13 @@ class Constants(BaseConstants):
 
 
 class Subsession(BaseSubsession):
-    ...
+    not_enough_players = models.BooleanField(
+        doc=""" this variable set to True when one of the players decide to
+        abandon the game (because he is tired to wait), and
+        there is no enough players left in the session to complete the group.
+        then those remaining get the opportunity to finish the game.""",
+        initial=False
+    )
 
 
 class Group(BaseGroup):

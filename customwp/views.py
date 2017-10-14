@@ -15,10 +15,12 @@ from otree.models_concrete import (
     CompletedGroupWaitPage, PageTimeout, UndefinedFormModel,
     ParticipantLockModel, GlobalLockModel, ParticipantToPlayerLookup
 )
+from otree.models import Participant
 import time
 import channels
 import json
 from .consumers import get_group_name
+
 
 class CustomWaitPage(WaitPage):
     template_name = 'customwp/CustomWaitPage.html'
@@ -26,6 +28,7 @@ class CustomWaitPage(WaitPage):
 
 class CustomPage(Page):
     timeout_seconds = 60
+
     def is_displayed(self):
         return not self.player.outofthegame and self.extra_is_displayed()
 
@@ -48,18 +51,24 @@ class StartWP(CustomWaitPage):
         time_left = self.player.startwp_time + Constants.startwp_timer - now
         return {'time_left': round(time_left)}
 
+    def dispatch(self, *args, **kwargs):
+        curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
+        if self.request.method == 'POST':
+            curparticipant.vars['endofgame'] = True
+            curparticipant.save()
+        return super().dispatch(*args, **kwargs)
+
     def get_players_for_group(self, waiting_players):
-        post_dict = self.request.POST.dict()
-        endofgame = post_dict.get('endofgame')
+        print(type(waiting_players))
+        endofgamers = [p for p in waiting_players if p.participant.vars.get('endofgame')]
+        if endofgamers:
+            return endofgamers
         slowpokes = [p.participant for p in self.subsession.get_players()
                      if p.participant._index_in_pages
-                     <= self.index_in_pages]
+                     <= self._index_in_pages]
         if len(slowpokes) <= Constants.players_per_group:
             self.subsession.not_enough_players = True
-        if endofgame:
-            curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
-            curplayer.outofthegame = True
-            return [curplayer]
+
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players
 

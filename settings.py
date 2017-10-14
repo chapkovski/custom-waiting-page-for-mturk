@@ -161,4 +161,4 @@ SESSION_CONFIGS = [
 # }]
 # print(TEMPLATES)
 otree.settings.augment_settings(globals())
-CHANNEL_LAYERS['inmemory']['BACKEND'] = 'otree.channels.asgi_redis.RedisChannelLayer'
+# CHANNEL_LAYERS['inmemory']['BACKEND'] = 'otree.channels.asgi_redis.RedisChannelLayer'

@@ -5,23 +5,11 @@ from .models import Player, Subsession, Constants, Group as OtreeGroup
 import json
 
 
-
 def send_message(message, group_pk, gbat, index_in_pages):
-    those_with_us = []
-    if gbat:
-        those_with_us = Player.objects.filter(
-            group__pk=group_pk,
-            participant___index_in_pages=index_in_pages,
-            _gbat_arrived=True,
-            _gbat_grouped=False,
-            participant__is_on_wait_page=True,
-        )
-    else:
-        those_with_us = Player.objects.filter(
-            participant___index_in_pages=index_in_pages,
-            group__pk=group_pk,
-        )
-
+    those_with_us = Player.objects.filter(
+        group__pk=group_pk,
+        current_wp=index_in_pages,
+    )
     how_many_arrived = len(those_with_us)
     left_to_wait = Constants.players_per_group - how_many_arrived
     textforgroup = json.dumps({
@@ -35,6 +23,9 @@ def send_message(message, group_pk, gbat, index_in_pages):
 
 def ws_connect(message, participant_code, group_pk, player_pk, index_in_pages, gbat):
     print('somebody connected...')
+    player = Player.objects.get(pk=player_pk)
+    player.current_wp = index_in_pages
+    player.save()
     Group('group_{}'.format(group_pk)).add(message.reply_channel)
     send_message(message, group_pk, gbat, index_in_pages)
 
@@ -43,9 +34,11 @@ def ws_message(message, participant_code, group_pk, player_pk, index_in_pages, g
     ...
 
 
-
 # Connected to websocket.disconnect
-def ws_disconnect(message, participant_code, group_pk, player_pk, index_in_pages,gbat):
+def ws_disconnect(message, participant_code, group_pk, player_pk, index_in_pages, gbat):
+    player = Player.objects.get(pk=player_pk)
+    player.current_wp = None
+    player.save()
     print('somebody disconnected...')
     Group('group_{}'.format(group_pk)).discard(message.reply_channel)
     send_message(message, group_pk, gbat, index_in_pages)

@@ -23,19 +23,18 @@ import json
 
 # from .consumers import get_group_name
 
-
+def vars_for_all_templates(self):
+    return {'index_in_pages': self._index_in_pages, }
 class CustomWaitPage(WaitPage):
     template_name = 'customwp/CustomWaitPage.html'
 
-    def vars_for_template(self):
-        return {'index_in_pages': self._index_in_pages, }
 
 
 class CustomPage(Page):
     timeout_seconds = 60
 
     def is_displayed(self):
-        return not self.player.outofthegame and self.extra_is_displayed()
+        return not self.participant.vars.get('endofgame') and self.extra_is_displayed()
 
     def extra_is_displayed(self):
         return True
@@ -49,14 +48,12 @@ class StartWP(CustomWaitPage):
         return self.subsession.round_number == 1
 
     def vars_for_template(self):
-        context = super().vars_for_template()
         now = time.time()
         if not self.player.startwp_timer_set:
             self.player.startwp_timer_set = True
             self.player.startwp_time = time.time()
         time_left = self.player.startwp_time + Constants.startwp_timer - now
-        context['time_left'] = round(time_left)
-        return context
+        return {'time_left':round(time_left)}
 
     def dispatch(self, *args, **kwargs):
         curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
@@ -66,14 +63,13 @@ class StartWP(CustomWaitPage):
         return super().dispatch(*args, **kwargs)
 
     def get_players_for_group(self, waiting_players):
-        print(type(waiting_players))
         endofgamers = [p for p in waiting_players if p.participant.vars.get('endofgame')]
         if endofgamers:
             return endofgamers
         slowpokes = [p.participant for p in self.subsession.get_players()
                      if p.participant._index_in_pages
                      <= self._index_in_pages]
-        if len(slowpokes) <= Constants.players_per_group:
+        if len(slowpokes) < Constants.players_per_group:
             self.subsession.not_enough_players = True
 
         if len(waiting_players) == Constants.players_per_group:

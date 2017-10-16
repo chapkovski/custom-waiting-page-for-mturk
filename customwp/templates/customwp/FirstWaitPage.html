@@ -23,12 +23,10 @@
             We apologise for the inconvenience.
         </div>
     {% else %}
-        <div id="otree-timeout" class="alert alert-warning" style="display:block;">
+        <div id="otree-timeout-warning" class="alert alert-warning" style="display:block;">
             <p>You can finish the study if nobody arrives in:
-                <span style="font-weight: bold">
                 <span class="glyphicon glyphicon-time"></span>
-                <span id="minutes"></span>:<span id="seconds"></span>
-            </span>
+                <strong><span id="otree-timer__time-left"></span></strong>
             </p>
         </div>
     {% endif %}
@@ -47,24 +45,25 @@
 
 {% block scripts %}
     {{ block.super }}
-{#    <script type="text/javascript" src= "{% static "directauction/js/jquery.countdown.js" %}" ></script>#}
-{##}
-{#    <script type="text/javascript">#}
-{##}
+<script src="{% static 'otree/js/jquery.countdown.min.js' %}"></script>
+
+    <script type="text/javascript">
+
 {#        $('div#otree-timeout').show();#}
-{#        var currentDate = new Date();#}
-{#        var milliseconds = Math.floor({{ time_left|json }} * 1000);#}
-{#        $('span#otree-timeout').countdown(currentDate.valueOf() + milliseconds)#}
-{#            .on('update.countdown', function (event) {#}
-{#                // %-N is "Total count of minutes till the end, non-padded"#}
-{#                // %S is seconds left#}
-{#                var format = '%-N:%S';#}
-{#                $(this).html(event.strftime(format));#}
-{#            })#}
-{#            .on('finish.countdown', function (event) {#}
-{#                $('#otree-timeout').hide(duration = 0);#}
-{#                $('#finish_study').show();#}
-{#            });#}
+        var currentDate = new Date();
+        var milliseconds = Math.floor({{ time_left|json }} * 1000);
+        $('div#otree-timeout-warning').show();
+        $('span#otree-timer__time-left').countdown(currentDate.valueOf() + milliseconds)
+            .on('update.countdown', function (event) {
+                // %-N is "Total count of minutes till the end, non-padded"
+                // %S is seconds left
+                var format = '%-N:%S';
+                $(this).html(event.strftime(format));
+            })
+            .on('finish.countdown', function (event) {
+                $('div#otree-timeout-warning').hide(duration = 0);
+                $('#finish_study').show();
+            });
 
 
     </script>

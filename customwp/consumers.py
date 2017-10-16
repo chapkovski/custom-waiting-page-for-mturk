@@ -1,70 +1,51 @@
 from channels import Group
 from channels.sessions import channel_session
 import random
-from .models import Player, Subsession, Constants
+from .models import Player, Subsession, Constants, Group as OtreeGroup
 import json
-import time
-from otree.views.abstract import get_view_from_url
 
 
-def get_group_name(subsession_pk, index_in_pages, player_pk):
-    curplayer = Player.objects.get(pk=player_pk)
-    group_pk = curplayer.group.pk
-    group_name = 'mturkchannel_{}_{}_{}'.format(subsession_pk,
-                                                index_in_pages,
-                                                group_pk
-                                                )
-    return group_name
 
-
-def send_message(message, subsession, index_in_pages, player_pk, ):
-    curplayer = Player.objects.get(pk=player_pk)
-    url = curplayer.participant._url_i_should_be_on()
-    Page = get_view_from_url(url)
+def send_message(message, group_pk, gbat, index_in_pages):
     those_with_us = []
-    if hasattr(Page, 'group_by_arrival_time'):
-        if getattr(Page, 'group_by_arrival_time'):
-            those_with_us = Player.objects.filter(
-                subsession=subsession,
-                participant___index_in_pages=index_in_pages,
-                _group_by_arrival_time_arrived=True,
-                _group_by_arrival_time_grouped=False,
-            )
-        else:
-            those_with_us = Player.objects.filter(
-                subsession=subsession,
-                participant___index_in_pages=index_in_pages,
-                group=curplayer.group,
-            )
+    if gbat:
+        those_with_us = Player.objects.filter(
+            group__pk=group_pk,
+            participant___index_in_pages=index_in_pages,
+            _gbat_arrived=True,
+            _gbat_grouped=False,
+            participant__is_on_wait_page=True,
+        )
+    else:
+        those_with_us = Player.objects.filter(
+            participant___index_in_pages=index_in_pages,
+            group__pk=group_pk,
+        )
 
     how_many_arrived = len(those_with_us)
     left_to_wait = Constants.players_per_group - how_many_arrived
     textforgroup = json.dumps({
-                                "how_many_arrived": how_many_arrived,
-                                "left_to_wait": left_to_wait,
-                                })
-    Group(get_group_name(subsession, index_in_pages, player_pk)).send({
+        "how_many_arrived": how_many_arrived,
+        "left_to_wait": left_to_wait,
+    })
+    Group('group_{}'.format(group_pk)).send({
         "text": textforgroup,
     })
 
 
-def ws_connect(message, subsession, index_in_pages, player_pk):
-    cursubsession = Subsession.objects.get(pk=subsession)
+def ws_connect(message, participant_code, group_pk, player_pk, index_in_pages, gbat):
     print('somebody connected...')
-    Group(get_group_name(subsession, index_in_pages, player_pk)).add(message.reply_channel)
-    send_message(message, subsession, index_in_pages, player_pk)
+    Group('group_{}'.format(group_pk)).add(message.reply_channel)
+    send_message(message, group_pk, gbat, index_in_pages)
 
 
-def ws_message(message, subsession, index_in_pages, player_pk):
+def ws_message(message, participant_code, group_pk, player_pk, index_in_pages, gbat):
     ...
-    # textforgroup = json.dumps({"LastPlayers": True, })
-    # Group(get_group_name(subsession, index_in_pages, player_pk)).send({
-    #     "text": textforgroup,
-    # })
+
 
 
 # Connected to websocket.disconnect
-def ws_disconnect(message, subsession, index_in_pages, player_pk):
+def ws_disconnect(message, participant_code, group_pk, player_pk, index_in_pages,gbat):
     print('somebody disconnected...')
-    Group(get_group_name(subsession, index_in_pages, player_pk)).discard(message.reply_channel)
-    send_message(message, subsession, index_in_pages, player_pk)
+    Group('group_{}'.format(group_pk)).discard(message.reply_channel)
+    send_message(message, group_pk, gbat, index_in_pages)

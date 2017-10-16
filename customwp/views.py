@@ -19,11 +19,16 @@ from otree.models import Participant
 import time
 import channels
 import json
-from .consumers import get_group_name
+
+
+# from .consumers import get_group_name
 
 
 class CustomWaitPage(WaitPage):
     template_name = 'customwp/CustomWaitPage.html'
+
+    def vars_for_template(self):
+        return {'index_in_pages': self._index_in_pages, }
 
 
 class CustomPage(Page):
@@ -44,12 +49,14 @@ class StartWP(CustomWaitPage):
         return self.subsession.round_number == 1
 
     def vars_for_template(self):
+        context = super().vars_for_template()
         now = time.time()
         if not self.player.startwp_timer_set:
             self.player.startwp_timer_set = True
             self.player.startwp_time = time.time()
         time_left = self.player.startwp_time + Constants.startwp_timer - now
-        return {'time_left': round(time_left)}
+        context['time_left'] = round(time_left)
+        return context
 
     def dispatch(self, *args, **kwargs):
         curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])

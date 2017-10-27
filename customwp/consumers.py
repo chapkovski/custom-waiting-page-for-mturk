@@ -53,7 +53,7 @@ def send_message(message, group_pk, gbat, index_in_pages):
 
 def ws_connect(message, participant_code, group_pk, player_pk, index_in_pages, gbat):
     print('somebody connected...')
-    player = Player.objects.get(pk=player_pk)
+    player = Player.objects.get(pk=player_pk, participant__code_exact=participant_code )
     player.current_wp = index_in_pages
     new_task = get_task()
     player.last_correct_answer = new_task['correct_answer']
@@ -73,7 +73,9 @@ def ws_message(message, participant_code, group_pk, player_pk, index_in_pages, g
     jsonmessage = json.loads(message.content['text'])
     answer = jsonmessage.get('answer')
     if answer:
-        player = Player.objects.get(pk=player_pk)
+
+        player = Player.objects.get(pk=player_pk, participant__code_exact=participant_code)
+
 
         # tasks_attempted = player.participant.vars.get("tasks_attempted" , 0) + 1
         # player.participant.vars.set("tasks_attempted" , tasks_attempted)

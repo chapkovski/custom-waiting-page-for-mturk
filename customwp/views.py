@@ -25,9 +25,10 @@ import json
 
 def vars_for_all_templates(self):
     return {'index_in_pages': self._index_in_pages, }
+
+
 class CustomWaitPage(WaitPage):
     template_name = 'customwp/CustomWaitPage.html'
-
 
 
 class CustomPage(Page):
@@ -41,12 +42,12 @@ class CustomPage(Page):
 
 
 class StartWP(CustomWaitPage):
-    group_by_arrival_time = True
+    group_by_arrival_time = False
     template_name = 'customwp/FirstWaitPage.html'
-    use_real_effort_task=True
+    use_real_effort_task = False
+    pay_for_real_effort_task = 0
+    pay_for_waiting_time = 0
 
-    def is_displayed(self):
-        return self.subsession.round_number == 1
 
     def vars_for_template(self):
         now = time.time()
@@ -54,7 +55,7 @@ class StartWP(CustomWaitPage):
             self.player.startwp_timer_set = True
             self.player.startwp_time = time.time()
         time_left = self.player.startwp_time + Constants.startwp_timer - now
-        return {'time_left':round(time_left)}
+        return {'time_left': round(time_left)}
 
     def dispatch(self, *args, **kwargs):
         curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
@@ -76,8 +77,7 @@ class StartWP(CustomWaitPage):
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players
 
-    # def is_displayed(self):
-    #     return self.round_number == 1
+
 
 
 class Intro(CustomPage):

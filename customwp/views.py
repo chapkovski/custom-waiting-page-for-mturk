@@ -27,7 +27,9 @@ import json
 
 class CustomWpGenericMixin(object):
     # Base Mixin... must be used for ALL players pages of our site!!!
-
+    use_real_effort_task=False
+    pay_by_task = 0
+    pay_by_time = 0
 
     def __init__(self):
         super(CustomWpGenericMixin, self).__init__()
@@ -41,10 +43,19 @@ class CustomWpGenericMixin(object):
                 return game_condition and second_condition
             return decorated_is_display
         setattr(self, "is_displayed", decorate_is_displayed(getattr(self, "is_displayed"))) 
+                    # IS A WAIT PAGE
+        def decorate_after_all_players_arrive(func):
+            def decorated_after_all_players_arrive(*args, **kwargs):
+                self.extra_task_to_decorate_start_of_after_all_players_arrive()
+                func(*args, **kwargs)
+                self.extra_task_to_decorate_end_of_after_all_players_arrive()
+            return decorated_after_all_players_arrive
+        setattr(self, "after_all_players_arrive", decorate_after_all_players_arrive(getattr(self, "after_all_players_arrive")))
 
     def extra_condition_to_decorate_is_display(self):
-
         return not self.player.participant.vars.get('go_to_the_end', False) 
+
+    def extra_task_to_decorate_end_of_after_all_players_arrive(self):
 
 
 
@@ -70,6 +81,7 @@ class StartWP(CustomWpGenericMixin, CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
     use_real_effort_task=True
+    pay_by_task = 1.5 
 
     def is_displayed(self):
         return self.subsession.round_number == 1

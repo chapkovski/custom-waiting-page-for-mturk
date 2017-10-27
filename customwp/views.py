@@ -23,6 +23,32 @@ import json
 
 # from .consumers import get_group_name
 
+
+
+class CustomWpGenericMixin(object):
+    # Base Mixin... must be used for ALL players pages of our site!!!
+
+
+    def __init__(self):
+        super(CustomWpGenericMixin, self).__init__()
+        
+        # We need to edit is_displayed() method dynamically, when creating an instance, since custom use is that it is overriden in the last child
+        def decorate_is_displayed(func):
+            def decorated_is_display(*args, **kwargs):
+                game_condition = func(*args, **kwargs) 
+                # we need to first run them both separately to make sure that both conditions are executed
+                second_condition = self.extra_condition_to_decorate_is_display()
+                return game_condition and second_condition
+            return decorated_is_display
+        setattr(self, "is_displayed", decorate_is_displayed(getattr(self, "is_displayed"))) 
+
+    def extra_condition_to_decorate_is_display(self):
+
+        return not self.player.participant.vars.get('go_to_the_end', False) 
+
+
+
+
 def vars_for_all_templates(self):
     return {'index_in_pages': self._index_in_pages, }
 
@@ -41,8 +67,9 @@ class CustomPage(Page):
         return True
 
 
-class StartWP(CustomWaitPage):
-    group_by_arrival_time = False
+
+class StartWP(CustomWpGenericMixin, CustomWaitPage):
+    group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
     use_real_effort_task = False
     pay_for_real_effort_task = 0

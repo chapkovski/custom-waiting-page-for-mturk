@@ -24,7 +24,7 @@ import json
 # from .consumers import get_group_name
 
 
-class CustomPage(WaitPage):
+class CustomPage(Page):
     def extra_condition_to_decorate_is_display(self):
         return not self.player.participant.vars.get('go_to_the_end', False)
 
@@ -46,6 +46,7 @@ class CustomPage(WaitPage):
 
 class CustomWaitPage(WaitPage):
     # Base Mixin... must be used for ALL players pages of our site!!!
+    template_name = 'customwp/FirstWaitPage.html'
     use_real_effort_task = False
     pay_by_task = 0
     pay_by_time = 0
@@ -61,10 +62,26 @@ class CustomWaitPage(WaitPage):
                                                                         0) + p.participant.vars.get(
             "tasks_correct", 0) * self.pay_by_task + current_paying_time * self.pay_by_time
 
+    def dispatch(self, *args, **kwargs):
+        curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
+
+        if self.request.method == 'POST':
+            print('POST HAS BEEN INSERTED')
+            curparticipant.vars['go_to_the_end'] = True
+            curparticipant.save()
+        print('CURPARTICIOANT GAME END', curparticipant.vars.get('go_to_the_end'))
+        return super().dispatch(*args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        now = time.time()
+        if not self.player.startwp_timer_set:
+            self.player.startwp_timer_set = True
+            self.player.startwp_time = time.time()
+        time_left = self.player.startwp_time + Constants.startwp_timer - now
         context.update({
             'index_in_pages': self._index_in_pages,
+            'time_left': round(time_left)
         })
         return context
 
@@ -73,7 +90,6 @@ class CustomWaitPage(WaitPage):
 
     def extra_condition_to_decorate_is_display(self):
         self.participant.vars.setdefault('starting_time_stamp_{}'.format(self._index_in_pages), time.time())
-
         return not self.player.participant.vars.get('go_to_the_end', False)
 
     def __init__(self):
@@ -115,47 +131,28 @@ class CustomWaitPage(WaitPage):
                 self.set_waiting_page_payoff(p)
 
 
-class FirstCustomWaitPage(CustomWaitPage):
-    template_name = 'customwp/CustomWaitPage.html'
-
-    def dispatch(self, *args, **kwargs):
-        curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
-        if self.request.method == 'POST':
-            curparticipant.vars['endofgame'] = True
-            curparticipant.save()
-        return super().dispatch(*args, **kwargs)
-
-
-class StartWP(FirstCustomWaitPage):
+class StartWP(CustomWaitPage):
     group_by_arrival_time = True
-    template_name = 'customwp/FirstWaitPage.html'
+
     use_real_effort_task = True
     pay_by_task = 1.5
 
-    def is_displayed(self):
-        return self.subsession.round_number == 1
+    # def is_displayed(self):
+    #     return self.subsession.round_number == 1
 
-    def vars_for_template(self):
-        now = time.time()
-        if not self.player.startwp_timer_set:
-            self.player.startwp_timer_set = True
-            self.player.startwp_time = time.time()
-        time_left = self.player.startwp_time + Constants.startwp_timer - now
-        return {'time_left': round(time_left)}
-
-
-    def get_players_for_group(self, waiting_players):
-        endofgamers = [p for p in waiting_players if p.participant.vars.get('endofgame')]
-        if endofgamers:
-            return endofgamers
-        slowpokes = [p.participant for p in self.subsession.get_players()
-                     if p.participant._index_in_pages
-                     <= self._index_in_pages]
-        if len(slowpokes) < Constants.players_per_group:
-            self.subsession.not_enough_players = True
-
-        if len(waiting_players) == Constants.players_per_group:
-            return waiting_players
+    #
+    # def get_players_for_group(self, waiting_players):
+    #     endofgamers = [p for p in waiting_players if p.participant.vars.get('endofgame')]
+    #     if endofgamers:
+    #         return endofgamers
+    #     slowpokes = [p.participant for p in self.subsession.get_players()
+    #                  if p.participant._index_in_pages
+    #                  <= self._index_in_pages]
+    #     if len(slowpokes) < Constants.players_per_group:
+    #         self.subsession.not_enough_players = True
+    #
+    #     if len(waiting_players) == Constants.players_per_group:
+    #         return waiting_players
 
 
 class Intro(CustomPage):

@@ -10,6 +10,7 @@ import random
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
+from django.core.exceptions import PermissionDenied
 from otree.models_concrete import (
     PageCompletion, CompletedSubsessionWaitPage,
     CompletedGroupWaitPage, PageTimeout, UndefinedFormModel,
@@ -64,6 +65,10 @@ class CustomWaitPage(WaitPage):
         curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
 
         if self.request.method == 'POST':
+            now = time.time()
+            time_left = curparticipant.vars.get("startwp_time", 0 ) + Constants.startwp_timer - now
+            if time_left > 0 :
+                raise PermissionDenied
             curparticipant.vars['go_to_the_end'] = True
             curparticipant.save()
         return super().dispatch(*args, **kwargs)
@@ -80,6 +85,9 @@ class CustomWaitPage(WaitPage):
             'time_left': round(time_left)
         })
         return context
+
+
+
 
     def extra_task_to_decorate_start_of_after_all_players_arrive(self):
         ...

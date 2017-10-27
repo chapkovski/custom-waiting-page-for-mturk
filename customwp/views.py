@@ -25,14 +25,14 @@ import json
 
 
 
-class CustomWpGenericMixin(object):
+class CustomWaitPage(WaitPage):
     # Base Mixin... must be used for ALL players pages of our site!!!
     use_real_effort_task=False
     pay_by_task = 0
     pay_by_time = 0
 
     def __init__(self):
-        super(CustomWpGenericMixin, self).__init__()
+        super(CustomWaitPage, self).__init__()
         
         # We need to edit is_displayed() method dynamically, when creating an instance, since custom use is that it is overriden in the last child
         def decorate_is_displayed(func):
@@ -56,13 +56,29 @@ class CustomWpGenericMixin(object):
         return not self.player.participant.vars.get('go_to_the_end', False) 
 
     def extra_task_to_decorate_end_of_after_all_players_arrive(self):
+        if self.wait_for_all_groups:
+            players = self.subsession.get_players()
+            for p in players:
+                pay_by_time_example = 65554755
+                p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait' , 0 ) + p.participant.vars.get( "tasks_correct",0) * self.pay_by_task + pay_by_time_example 
 
+        else:
+            players = self.group.get_players()
 
+            for p in players:
+                pay_by_time_example = 65554755
+                p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait' , 0 ) + p.participant.vars.get( "tasks_correct",0) * self.pay_by_task + pay_by_time_example 
 
+    def extra_task_to_decorate_start_of_after_all_players_arrive(self):
+        pass
+
+# extra_task_to_decorate_start_of_after_all_players_arrive
 
 def vars_for_all_templates(self):
     return {'index_in_pages': self._index_in_pages, }
-class CustomWaitPage(WaitPage):
+
+
+class FirstCustomWaitPage(CustomWaitPage):
     template_name = 'customwp/CustomWaitPage.html'
 
 
@@ -77,7 +93,7 @@ class CustomPage(Page):
         return True
 
 
-class StartWP(CustomWpGenericMixin, CustomWaitPage):
+class StartWP(FirstCustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
     use_real_effort_task=True

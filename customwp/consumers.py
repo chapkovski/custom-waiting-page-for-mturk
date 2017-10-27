@@ -74,9 +74,18 @@ def ws_message(message, participant_code, group_pk, player_pk, index_in_pages, g
     answer = jsonmessage.get('answer')
     if answer:
         player = Player.objects.get(pk=player_pk)
+
+        # tasks_attempted = player.participant.vars.get("tasks_attempted" , 0) + 1
+        # player.participant.vars.set("tasks_attempted" , tasks_attempted)
+        add_one(player, "tasks_attempted")
+
         player.tasks_attempted += 1
         if int(answer) == int(player.last_correct_answer):
             player.tasks_correct += 1
+            # tasks_correct = player.participant.vars.get("tasks_correct" , 0) + 1
+            # player.participant.vars.set("tasks_correct" , tasks_correct)
+            add_one(player, "tasks_correct")
+
         new_task = get_task()
         new_task['tasks_correct'] = player.tasks_correct
         new_task['tasks_attempted'] = player.tasks_attempted
@@ -96,6 +105,8 @@ def ws_disconnect(message, participant_code, group_pk, player_pk, index_in_pages
     send_message(message, group_pk, gbat, index_in_pages)
 
 
-
+def add_one(player, name_of_the_record):
+    var = player.participant.vars.get(name_of_the_record, 0) + 1
+    player.participant.vars[name_of_the_record] = var
 
 

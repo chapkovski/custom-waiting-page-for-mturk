@@ -133,11 +133,8 @@ class CustomWaitPage(WaitPage):
 
 class StartWP(CustomWaitPage):
     group_by_arrival_time = True
-
     use_real_effort_task = True
     pay_by_task = 1.5
-
-
 
 
 class Intro(CustomPage):

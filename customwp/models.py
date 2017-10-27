@@ -41,3 +41,7 @@ class Player(BasePlayer):
     startwp_time = models.PositiveIntegerField()
     current_wp = models.IntegerField()
     outofthegame = models.BooleanField()
+    last_correct_answer=models.IntegerField()
+    tasks_attempted = models.PositiveIntegerField(initial=0)
+    tasks_correct = models.PositiveIntegerField(initial=0)
+

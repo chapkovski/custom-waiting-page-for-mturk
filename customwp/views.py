@@ -43,6 +43,7 @@ class CustomPage(Page):
 class StartWP(CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
+    use_real_effort_task=True
 
     def is_displayed(self):
         return self.subsession.round_number == 1
@@ -75,8 +76,8 @@ class StartWP(CustomWaitPage):
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players
 
-    def is_displayed(self):
-        return self.round_number == 1
+    # def is_displayed(self):
+    #     return self.round_number == 1
 
 
 class Intro(CustomPage):

@@ -137,22 +137,7 @@ class StartWP(CustomWaitPage):
     use_real_effort_task = True
     pay_by_task = 1.5
 
-    # def is_displayed(self):
-    #     return self.subsession.round_number == 1
 
-    #
-    # def get_players_for_group(self, waiting_players):
-    #     endofgamers = [p for p in waiting_players if p.participant.vars.get('endofgame')]
-    #     if endofgamers:
-    #         return endofgamers
-    #     slowpokes = [p.participant for p in self.subsession.get_players()
-    #                  if p.participant._index_in_pages
-    #                  <= self._index_in_pages]
-    #     if len(slowpokes) < Constants.players_per_group:
-    #         self.subsession.not_enough_players = True
-    #
-    #     if len(waiting_players) == Constants.players_per_group:
-    #         return waiting_players
 
 
 class Intro(CustomPage):

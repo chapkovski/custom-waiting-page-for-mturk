@@ -50,6 +50,17 @@ class CustomWaitPage(WaitPage):
     pay_by_task = 0
     pay_by_time = 0
 
+    def set_waiting_page_payoff(self, p):
+        p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())
+        current_paying_time = p.participant.vars.get('ending_time_stamp_{}'.format(self._index_in_pages), 0) - \
+                              p.participant.vars.get('starting_time_stamp_{}'.format(self._index_in_pages), 0)
+        p.participant.vars['total_waiting_time'] = p.participant.vars.get('total_waiting_time',
+                                                                          0) + current_paying_time
+
+        p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait',
+                                                                        0) + p.participant.vars.get(
+            "tasks_correct", 0) * self.pay_by_task + current_paying_time * self.pay_by_time
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
@@ -96,29 +107,23 @@ class CustomWaitPage(WaitPage):
         if self.wait_for_all_groups:
             players = self.subsession.get_players()
             for p in players:
-                p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())
-                paying_time = p.participant.vars.get('ending_time_stamp_{}'.format(self._index_in_pages), 0) - \
-                              p.participant.vars.get('starting_time_stamp_{}'.format(self._index_in_pages), 0)
-                print('WAITING TIME :: ',paying_time)
-                p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait',
-                                                                                0) + p.participant.vars.get(
-                    "tasks_correct", 0) * self.pay_by_task + paying_time * self.pay_by_time
+                self.set_waiting_page_payoff(p)
 
         else:
             players = self.group.get_players()
-
             for p in players:
-                p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())
-                paying_time = p.participant.vars.get('ending_time_stamp_{}'.format(self._index_in_pages), 0) - \
-                    p.participant.vars.get('starting_time_stamp_{}'.format(self._index_in_pages), 0)
-                print('WAITING TIME :: ', paying_time)
-                p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait',
-                                                                                0) + p.participant.vars.get(
-                    "tasks_correct", 0) * self.pay_by_task + paying_time * self.pay_by_time
+                self.set_waiting_page_payoff(p)
 
 
 class FirstCustomWaitPage(CustomWaitPage):
     template_name = 'customwp/CustomWaitPage.html'
+
+    def dispatch(self, *args, **kwargs):
+        curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
+        if self.request.method == 'POST':
+            curparticipant.vars['endofgame'] = True
+            curparticipant.save()
+        return super().dispatch(*args, **kwargs)
 
 
 class StartWP(FirstCustomWaitPage):
@@ -138,12 +143,6 @@ class StartWP(FirstCustomWaitPage):
         time_left = self.player.startwp_time + Constants.startwp_timer - now
         return {'time_left': round(time_left)}
 
-    def dispatch(self, *args, **kwargs):
-        curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
-        if self.request.method == 'POST':
-            curparticipant.vars['endofgame'] = True
-            curparticipant.save()
-        return super().dispatch(*args, **kwargs)
 
     def get_players_for_group(self, waiting_players):
         endofgamers = [p for p in waiting_players if p.participant.vars.get('endofgame')]

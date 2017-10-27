@@ -66,10 +66,8 @@ class CustomWaitPage(WaitPage):
         curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
 
         if self.request.method == 'POST':
-            print('POST HAS BEEN INSERTED')
             curparticipant.vars['go_to_the_end'] = True
             curparticipant.save()
-        print('CURPARTICIOANT GAME END', curparticipant.vars.get('go_to_the_end'))
         return super().dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):

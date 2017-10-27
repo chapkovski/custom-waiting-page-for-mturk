@@ -5,7 +5,7 @@ from .models import Player, Subsession, Constants, Group as OtreeGroup
 import json
 import random
 from random import randint
-
+from django.core.exceptions import ObjectDoesNotExist
 # =============
 def slicelist(l, n):
     return [l[i:i + n] for i in range(0, len(l), n)]
@@ -53,7 +53,10 @@ def send_message(message, group_pk, gbat, index_in_pages):
 
 def ws_connect(message, participant_code, group_pk, player_pk, index_in_pages, gbat):
     print('somebody connected...')
-    player = Player.objects.get(pk=player_pk, participant__code_exact=participant_code )
+    try:
+        player = Player.objects.get(pk=player_pk, participant__code=participant_code)
+    except ObjectDoesNotExist:
+        return None
     player.current_wp = index_in_pages
     new_task = get_task()
     player.last_correct_answer = new_task['correct_answer']
@@ -73,8 +76,10 @@ def ws_message(message, participant_code, group_pk, player_pk, index_in_pages, g
     jsonmessage = json.loads(message.content['text'])
     answer = jsonmessage.get('answer')
     if answer:
-
-        player = Player.objects.get(pk=player_pk, participant__code_exact=participant_code)
+        try:
+            player = Player.objects.get(pk=player_pk, participant__code=participant_code)
+        except ObjectDoesNotExist:
+            return None
 
 
         # tasks_attempted = player.participant.vars.get("tasks_attempted" , 0) + 1

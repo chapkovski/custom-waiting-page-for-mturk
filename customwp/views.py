@@ -21,8 +21,6 @@ import channels
 import json
 
 
-# from .consumers import get_group_name
-
 
 class CustomPage(Page):
     def extra_condition_to_decorate_is_display(self):

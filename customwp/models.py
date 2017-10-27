@@ -12,7 +12,7 @@ doc = """
 
 
 class Constants(BaseConstants):
-    name_in_url = 'cusotomwp'
+    name_in_url = 'customwp'
     players_per_group = 3
     num_rounds = 1
     # the startwp_timer defines how long the player has to wait at the

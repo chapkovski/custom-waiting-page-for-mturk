@@ -1,4 +1,5 @@
-<script>
+{% if view.use_real_effort_task %}
+    <script>
         $(document).ready(function () {
             $(window).keydown(function (event) {
                 if (event.keyCode == 13) {
@@ -7,7 +8,9 @@
                 }
             });
         });
-                $("button.answer").on("click", function () {
+    </script>
+    <script>
+        $("button.answer").on("click", function () {
             var msg = {
                 'answer': $('input#answer').val(),
             };
@@ -25,9 +28,10 @@
             }
         });
     </script>
+{% endif %}
 <script>
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/waiting_page/{{participant.code}}/{{ group.pk }}/{{ player.pk }}/{{index_in_pages}}/{% if view.group_by_arrival_time%}1{% else %}0{% endif %}");
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/waiting_page/{{participant.code}}/{{ group.pk }}/{{ player.pk }}/{{index_in_pages}}/{% if view.group_by_arrival_time%}1{% else %}0{% endif %}");
 
     window.onload = function () {
 
@@ -48,27 +52,29 @@
             var obj = JSON.parse(event.data);
             if (obj.hasOwnProperty('message_type')) {
                 if (obj.message_type == 'new_task') {
-                    $('span#correct_answer').html(obj.correct_answer);
-                    $('span#tasks_attempted').html(obj.tasks_attempted);
-                    $('span#tasks_correct').html(obj.tasks_correct);
-                    $('table#box1').empty();
-                    $('table#box2').empty();
-                    $.each(obj.mat1, function (i, row) {
-                        var tr = $('<tr>');
-                        $.each(row, function (j, cell) {
-                            $('<td>').html(cell).appendTo(tr);
+                    {% if view.use_real_effort_task %}
+                        $('span#correct_answer').html(obj.correct_answer);
+                        $('span#tasks_attempted').html(obj.tasks_attempted);
+                        $('span#tasks_correct').html(obj.tasks_correct);
+                        $('table#box1').empty();
+                        $('table#box2').empty();
+                        $.each(obj.mat1, function (i, row) {
+                            var tr = $('<tr>');
+                            $.each(row, function (j, cell) {
+                                $('<td>').html(cell).appendTo(tr);
+                            });
+                            $('table#box1').append(tr);
                         });
-                        $('table#box1').append(tr);
-                    });
-                    $.each(obj.mat2, function (i, row) {
-                        var tr = $('<tr>');
-                        $.each(row, function (j, cell) {
-                            $('<td>').html(cell).appendTo(tr);
+                        $.each(obj.mat2, function (i, row) {
+                            var tr = $('<tr>');
+                            $.each(row, function (j, cell) {
+                                $('<td>').html(cell).appendTo(tr);
+                            });
+                            $('table#box2').append(tr);
                         });
-                        $('table#box2').append(tr);
-                    });
 
-                    var obj = jQuery.parseJSON(event.data);
+                        var obj = jQuery.parseJSON(event.data);
+                    {% endif %}
                 }
                 else {
                     if (obj.hasOwnProperty('left_to_wait')) {
@@ -100,6 +106,3 @@
 
 </script>
 
-    <script>
-
-    </script>

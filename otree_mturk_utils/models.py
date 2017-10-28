@@ -8,6 +8,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+author = 'Essi Kujansuu - Philipp Chapkovski - Nicolas Gruyer/Economics Games'
+
+
 doc = """
 Custom Waiting Pages and Pages for mTurk
 """

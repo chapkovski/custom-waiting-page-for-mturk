@@ -1,0 +1,145 @@
+{% extends 'otree/WaitPage.html' %}
+{% load staticfiles otree_tags %}
+{% block title %}Please wait!{% endblock %}
+{% block styles %}
+    <style>
+        #left_to_wait {
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    {% comment %}
+        Can be used to display how many participants are missing, if the matching logic is simple (i.e. a fixed number of players, and no types)
+        Otherwise, do not use, it might show things like 5 participants are missing waiting for -1 more, for groups of 4, if the types that have arrived do not correspond to the composition of the groups
+        <div><b><span id="how_many_arrived"></span>/{{ Constants.players_per_group }}</b> participants are
+            already here...
+        </div>
+        <div>Waiting for <span id="left_to_wait"></span> more <span id="left_to_wait_people"></span>...</div>
+        <br/>
+    {% endcomment %}
+
+   <div id="otree-timeout-warning" class="alert alert-warning" style="display:block;">
+        <p>You can finish the study if nobody arrives in:
+            <span class="glyphicon glyphicon-time"></span>
+            <strong><span id="otree-timer__time-left"></span></strong>
+        </p>
+    </div>
+   
+    <form action="" method="post" role="form" class="form">
+        {% csrf_token %}
+        <div>
+            <button class="btn btn-primary" id='finish_study'
+                    style="display: none;"
+                    name="endofgame" value="{{ player.pk }}">
+                Finish the study
+            </button>
+        </div>
+        <br>
+    </form>
+
+    {% if view.use_real_effort_task %}
+
+        <head>
+            <style>
+                th, td {
+                    padding: 4px 6px 4px 6px;
+                }
+
+                table#box1 {
+                    background-color: #ecf2f9;
+                }
+
+                table#box2 {
+                    background-color: #ecf2f9;
+                }
+            </style>
+        </head>
+
+        <p>
+            Your task is to first find <b>the largest number in each of the two boxes</b> and then <b>add up the two
+            numbers</b>. <br>
+            Submit your answer in the box below. The correct answer is <span id="correct_answer"></span>!
+        </p>
+
+        <table style="width:100%">
+            <tr>
+                <th class="box-heading"> Box 1</th>
+                <th></th>
+                <th class="box-heading"> Box 2</th>
+            </tr>
+            <tr>
+
+                <!-- NEST ANOTHER TABLE! -->
+                <td class="table-borders">
+                    <table class="table-style" style="width:99%" id="box1">
+                    </table>
+                </td>
+
+                <!-- Some space -->
+                <td>
+
+                </td>
+                <!-- NEST ANOTHER TABLE! -->
+                <td class="table-borders">
+                    <table class="table-style" style="width:99%" id="box2">
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div>Your answer is:</div>
+        <input type="number" id="answer" class="offer" style="background-color: white" required>
+        <button class="answer" type="button">Answer</button>
+
+        <p> Tasks attempted so far: <span id="tasks_attempted">{{ player.tasks_attempted }}</span></p>
+        <p> Tasks correct so far: <span id="tasks_correct"> {{ player.tasks_correct }}</span></p>
+
+    {% endif %}
+
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    {% include 'otree_mturk_utils/waiting_page_channel.js.html' %}
+    <script src="{% static 'otree/js/jquery.countdown.min.js' %}"></script>
+
+        <script type="text/javascript">
+
+    {#        $('div#otree-timeout').show();#}
+            var currentDate = new Date();
+            var milliseconds = Math.floor({{ time_left|json }} * 1000);
+            $('div#otree-timeout-warning').show();
+            $('span#otree-timer__time-left').countdown(currentDate.valueOf() + milliseconds)
+                .on('update.countdown', function (event) {
+                    // %-N is "Total count of minutes till the end, non-padded"
+                    // %S is seconds left
+                    var format = '%-N:%S';
+                    var remainingTime = event.strftime(format);
+                    $(this).html(remainingTime);
+                    
+                    if(event.strftime('%-M') > 30){
+                        // Do not show if max waiting time is above 30 minutes
+                        $('div#otree-timeout-warning').filter(":visible").hide(duration = 0);
+                    };
+                   
+                   
+
+                })
+                .on('finish.countdown', function (event) {
+                    $('div#otree-timeout-warning').hide(duration = 0);
+                    $('#finish_study').show();
+                });
+
+
+        </script>
+
+{% endblock %}
+
+
+
+

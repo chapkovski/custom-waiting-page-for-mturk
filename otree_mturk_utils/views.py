@@ -59,7 +59,7 @@ class CustomPage(DecorateIsDisplayMixin , Page):
 
 class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
     # Base Mixin... must be used for ALL players pages of our site!!!
-    template_name = 'customwp/FirstWaitPage.html'
+    template_name = 'otree_mturk_utils/CustomWaitPage.html'
     use_real_effort_task = False
     pay_by_task = 0
     pay_by_time = 0

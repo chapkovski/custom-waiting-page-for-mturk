@@ -150,6 +150,12 @@ SESSION_CONFIGS = [
         'app_sequence': ['customwp'],
     },
 
+    {
+        'name': 'test',
+        'display_name': "testing indep. app",
+        'num_demo_participants': 3,
+        'app_sequence': ['testapp'],
+    },
 
 ]
 

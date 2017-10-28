@@ -2,7 +2,7 @@ from channels.routing import route
 from customwp.consumers import ws_message, ws_connect, ws_disconnect
 from otree.channels.routing import channel_routing
 from channels.routing import include, route_class
-waiting_channel_name = r'^/(?P<participant_code>\w+)/(?P<group_pk>\w+)/(?P<player_pk>\w+)/(?P<index_in_pages>\w+)/(?P<gbat>\w+)$'
+waiting_channel_name = r'^/(?P<participant_code>\w+)/(?P<app_name>\w+)/(?P<group_pk>\w+)/(?P<player_pk>\w+)/(?P<index_in_pages>\w+)/(?P<gbat>\w+)$'
 customwp_routing = [route("websocket.connect",
                  ws_connect,  path=waiting_channel_name ),
                  route("websocket.receive",

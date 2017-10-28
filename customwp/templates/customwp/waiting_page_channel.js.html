@@ -31,7 +31,7 @@
 {% endif %}
 <script>
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/waiting_page/{{participant.code}}/{{ group.pk }}/{{ player.pk }}/{{index_in_pages}}/{% if view.group_by_arrival_time%}1{% else %}0{% endif %}");
+    var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/waiting_page/{{participant.code}}/{{ app_name }}/{{ group.pk }}/{{ player.pk }}/{{index_in_pages}}/{% if view.group_by_arrival_time%}1{% else %}0{% endif %}");
 
     window.onload = function () {
 

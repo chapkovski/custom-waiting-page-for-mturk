@@ -61,6 +61,7 @@ class CustomWaitPage(WaitPage):
             "tasks_correct", 0) * self.pay_by_task + current_paying_time * self.pay_by_time
 
     def dispatch(self, *args, **kwargs):
+
         curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
 
         if self.request.method == 'POST':
@@ -70,14 +71,17 @@ class CustomWaitPage(WaitPage):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        from django.core.urlresolvers import resolve
+
         now = time.time()
-        if not self.player.startwp_timer_set:
-            self.player.startwp_timer_set = True
-            self.player.startwp_time = time.time()
-        time_left = self.player.startwp_time + Constants.startwp_timer - now
+        if not self.participant.mturk.startwp_timer_set:
+            self.participant.mturk.startwp_timer_set = True
+            self.participant.mturk.startwp_time = time.time()
+        time_left = self.participant.mturk.startwp_time + Constants.startwp_timer - now
         context.update({
             'index_in_pages': self._index_in_pages,
-            'time_left': round(time_left)
+            'time_left': round(time_left),
+            'app_name': self.player._meta.app_label
         })
         return context
 

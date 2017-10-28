@@ -69,7 +69,7 @@ class CustomWaitPage(WaitPage):
         if self.request.method == 'POST':
             now = time.time()
             time_left = curparticipant.vars.get("startwp_time", 0 ) + Constants.startwp_timer - now
-            if time_left > 0 :
+            if time_left > 0:
                 url_should_be_on = curparticipant._url_i_should_be_on()
                 return HttpResponseRedirect(url_should_be_on)
             curparticipant.vars['go_to_the_end'] = True

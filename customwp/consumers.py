@@ -6,6 +6,7 @@ import json
 import random
 from random import randint
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from otree.models import Participant
 from importlib import import_module
 
@@ -79,22 +80,24 @@ def ws_message(message, participant_code, app_name,group_pk, player_pk, index_in
     answer = jsonmessage.get('answer')
     if answer:
         try:
-            mturker = Mturk.objects.get(Participant__code=participant_code)
+            with transaction.atomic():
+                mturker = Mturk.objects.select_for_update().get(Participant__code=participant_code)
+                mturker.tasks_attempted += 1
+                if int(answer) == int(mturker.last_correct_answer):
+                    mturker.tasks_correct += 1
+                    # add_one(player, "tasks_correct")
+
+                new_task = get_task()
+                new_task['tasks_correct'] = mturker.tasks_correct
+                new_task['tasks_attempted'] = mturker.tasks_attempted
+                mturker.last_correct_answer = new_task['correct_answer']
+                mturker.save()
+
         except ObjectDoesNotExist:
             return None
+        except:
+            raise
 
-        # add_one(player, "tasks_attempted")
-
-        mturker.tasks_attempted += 1
-        if int(answer) == int(mturker.last_correct_answer):
-            mturker.tasks_correct += 1
-            # add_one(player, "tasks_correct")
-
-        new_task = get_task()
-        new_task['tasks_correct'] = mturker.tasks_correct
-        new_task['tasks_attempted'] = mturker.tasks_attempted
-        mturker.last_correct_answer = new_task['correct_answer']
-        mturker.save()
         message.reply_channel.send({'text': json.dumps(new_task)})
 
 

@@ -85,11 +85,10 @@ def ws_message(message, participant_code, app_name, group_pk, player_pk, index_i
     if answer:
         with transaction.atomic():
             try:
-
                 mturker = Mturk.objects.select_for_update().get(Participant__code=participant_code)
                 wprecord = WPJobRecord.objects.get(mturker=mturker,
-                                                page_index=index_in_pages,
-                                                app=app_name)
+                                                   page_index=index_in_pages,
+                                                   app=app_name)
             except ObjectDoesNotExist:
                 return None
 
@@ -119,4 +118,3 @@ def ws_disconnect(message, participant_code, app_name, group_pk, player_pk, inde
     print('somebody disconnected...')
     Group('group_{}'.format(group_pk)).discard(message.reply_channel)
     send_message(message, app_name, group_pk, gbat, index_in_pages)
-

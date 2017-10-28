@@ -49,8 +49,10 @@ def send_message(message, app_name, group_pk, gbat, index_in_pages):
         participant__mturk__current_wp=index_in_pages,
     )
     how_many_arrived = len(those_with_us)
+
     players_per_group = get_models_module(app_name).Constants.players_per_group
     left_to_wait = players_per_group - how_many_arrived
+
     textforgroup = json.dumps({
         "message_type": "players_update",
         "how_many_arrived": how_many_arrived,

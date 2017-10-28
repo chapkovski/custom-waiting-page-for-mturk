@@ -48,28 +48,5 @@ def save_participant(sender, instance, **kwargs):
 
 
 
-class Constants(BaseConstants):
-    # the startwp_timer defines how long the player has to wait at the
-    # first waiting page
-    # before he or she has an option to finish the game without waiting for
-    # others
-    startwp_timer = 15
 
-
-# class Subsession(BaseSubsession):
-#     not_enough_players = models.BooleanField(
-#         doc=""" this variable set to True when one of the players decide to
-#         abandon the game (because he is tired to wait), and
-#         there is no enough players left in the session to complete the group.
-#         then those remaining get the opportunity to finish the game.""",
-#         initial=False
-#     )
-
-
-# class Group(BaseGroup):
-#     ...
-
-
-# class Player(BasePlayer):
-#     ...
 

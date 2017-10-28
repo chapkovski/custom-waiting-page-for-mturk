@@ -6,6 +6,7 @@ import json
 import random
 from random import randint
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
 from otree.models import Participant
 from importlib import import_module
 
@@ -80,44 +81,29 @@ def ws_connect(message, participant_code, app_name, group_pk, player_pk, index_i
 def ws_message(message, participant_code, app_name, group_pk, player_pk, index_in_pages, gbat):
     jsonmessage = json.loads(message.content['text'])
     answer = jsonmessage.get('answer')
+
     if answer:
-        try:
-<<<<<<< HEAD
-            mturker= Mturk.objects.get(Participant__code=participant_code)
-            wprecord = WPJobRecord.objects.get(mturker=mturker,
-                                            page_index=index_in_pages,
-                                            app=app_name)
-        except ObjectDoesNotExist:
-            return None
+        with transaction.atomic():
+            try:
 
-        wprecord.tasks_attempted += 1
+                mturker = Mturk.objects.select_for_update().get(Participant__code=participant_code)
+                wprecord = WPJobRecord.objects.get(mturker=mturker,
+                                                page_index=index_in_pages,
+                                                app=app_name)
+            except ObjectDoesNotExist:
+                return None
 
-        if int(answer) == int(wprecord.last_correct_answer):
-            wprecord.tasks_correct += 1
+            wprecord.tasks_attempted += 1
 
-        new_task = get_task()
-        new_task['tasks_correct'] = wprecord.tasks_correct
-        new_task['tasks_attempted'] = wprecord.tasks_attempted
-        wprecord.last_correct_answer = new_task['correct_answer']
-        wprecord.save()
-=======
-            mturker = Mturk.objects.get(Participant__code=participant_code)
-        except ObjectDoesNotExist:
-            return None
+            if int(answer) == int(wprecord.last_correct_answer):
+                wprecord.tasks_correct += 1
 
-        # add_one(player, "tasks_attempted")
+            new_task = get_task()
+            new_task['tasks_correct'] = wprecord.tasks_correct
+            new_task['tasks_attempted'] = wprecord.tasks_attempted
+            wprecord.last_correct_answer = new_task['correct_answer']
+            wprecord.save()
 
-        mturker.tasks_attempted += 1
-        if int(answer) == int(mturker.last_correct_answer):
-            mturker.tasks_correct += 1
-            # add_one(player, "tasks_correct")
-
-        new_task = get_task()
-        new_task['tasks_correct'] = mturker.tasks_correct
-        new_task['tasks_attempted'] = mturker.tasks_attempted
-        mturker.last_correct_answer = new_task['correct_answer']
-        mturker.save()
->>>>>>> d1c9c1996320d94f915be6d1c1eceabfa84dafa2
         message.reply_channel.send({'text': json.dumps(new_task)})
 
 
@@ -132,15 +118,5 @@ def ws_disconnect(message, participant_code, app_name, group_pk, player_pk, inde
     mturker.save()
     print('somebody disconnected...')
     Group('group_{}'.format(group_pk)).discard(message.reply_channel)
-<<<<<<< HEAD
     send_message(message, app_name, group_pk, gbat, index_in_pages)
-=======
-    send_message(message, app_name,group_pk, gbat, index_in_pages)
 
-
-# def add_one(player, name_of_the_record):
-#     var = player.participant.vars.get(name_of_the_record, 0) + 1
-#     player.participant.vars[name_of_the_record] = var
-
-
->>>>>>> d1c9c1996320d94f915be6d1c1eceabfa84dafa2

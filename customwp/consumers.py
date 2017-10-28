@@ -79,22 +79,22 @@ def ws_message(message, participant_code, app_name,group_pk, player_pk, index_in
     answer = jsonmessage.get('answer')
     if answer:
         try:
-            player =get_models_module(app_name).Player.objects.get(pk=player_pk, participant__code=participant_code)
+            mturker = Mturk.objects.get(Participant__code=participant_code)
         except ObjectDoesNotExist:
             return None
 
-        add_one(player, "tasks_attempted")
+        # add_one(player, "tasks_attempted")
 
-        player.tasks_attempted += 1
-        if int(answer) == int(player.last_correct_answer):
-            player.tasks_correct += 1
-            add_one(player, "tasks_correct")
+        mturker.tasks_attempted += 1
+        if int(answer) == int(mturker.last_correct_answer):
+            mturker.tasks_correct += 1
+            # add_one(player, "tasks_correct")
 
         new_task = get_task()
-        new_task['tasks_correct'] = player.tasks_correct
-        new_task['tasks_attempted'] = player.tasks_attempted
-        player.last_correct_answer = new_task['correct_answer']
-        player.save()
+        new_task['tasks_correct'] = mturker.tasks_correct
+        new_task['tasks_attempted'] = mturker.tasks_attempted
+        mturker.last_correct_answer = new_task['correct_answer']
+        mturker.save()
         message.reply_channel.send({'text': json.dumps(new_task)})
 
 
@@ -113,8 +113,8 @@ def ws_disconnect(message, participant_code, app_name, group_pk, player_pk, inde
     send_message(message, app_name,group_pk, gbat, index_in_pages)
 
 
-def add_one(player, name_of_the_record):
-    var = player.participant.vars.get(name_of_the_record, 0) + 1
-    player.participant.vars[name_of_the_record] = var
+# def add_one(player, name_of_the_record):
+#     var = player.participant.vars.get(name_of_the_record, 0) + 1
+#     player.participant.vars[name_of_the_record] = var
 
 

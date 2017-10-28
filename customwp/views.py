@@ -63,7 +63,7 @@ class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
     use_real_effort_task = False
     pay_by_task = 0
     pay_by_time = 0
-    startwp_timer = 15
+    startwp_timer = 7200
 
     def set_waiting_page_payoff(self, p):
         p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())

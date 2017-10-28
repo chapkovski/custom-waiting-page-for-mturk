@@ -10,31 +10,18 @@
 {% endblock %}
 {% block content %}
     {{ block.super }}
-    {% if subsession.not_enough_players %}
-
-        <div id="not_enough_players" class="alert alert-danger" role="alert">
-            Unfortunately, one of the other partipants has left. Now
-            there is no enough participants left to complete the study.
-            <br>
-            Please, click 'Finish the study'.
-            <br>
-            <b>You are still eligible for the participation fee!</b>
-            <br>
-            We apologise for the inconvenience.
-        </div>
-    {% else %}
-        <div id="otree-timeout-warning" class="alert alert-warning" style="display:block;">
-            <p>You can finish the study if nobody arrives in:
-                <span class="glyphicon glyphicon-time"></span>
-                <strong><span id="otree-timer__time-left"></span></strong>
-            </p>
-        </div>
-    {% endif %}
+    <div id="otree-timeout-warning" class="alert alert-warning" style="display:block;">
+        <p>You can finish the study if nobody arrives in:
+            <span class="glyphicon glyphicon-time"></span>
+            <strong><span id="otree-timer__time-left"></span></strong>
+        </p>
+    </div>
+   
     <form action="" method="post" role="form" class="form">
         {% csrf_token %}
         <div>
             <button class="btn btn-primary" id='finish_study'
-                    style="display:    {% if subsession.not_enough_players %}inline{% else %}none{% endif %};"
+                    style="display: none;"
                     name="endofgame" value="{{ player.pk }}">
                 Finish the study
             </button>
@@ -121,7 +108,16 @@
                 // %-N is "Total count of minutes till the end, non-padded"
                 // %S is seconds left
                 var format = '%-N:%S';
-                $(this).html(event.strftime(format));
+                var remainingTime = event.strftime(format);
+                $(this).html(remainingTime);
+                
+                if(event.strftime('%-M') > 30){
+                    // Do not show if max waiting time is above 30 minutes
+                    $('div#otree-timeout-warning').filter(":visible").hide(duration = 0);
+                };
+               
+               
+
             })
             .on('finish.countdown', function (event) {
                 $('div#otree-timeout-warning').hide(duration = 0);

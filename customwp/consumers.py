@@ -1,7 +1,7 @@
 from channels import Group
 from channels.sessions import channel_session
 import random
-from .models import Constants, Mturk, WPJobRecord, WPTimeRecord
+from .models import Mturk, WPJobRecord, WPTimeRecord
 import json
 import random
 from random import randint
@@ -51,6 +51,7 @@ def send_message(message, app_name, group_pk, gbat, index_in_pages):
     how_many_arrived = len(those_with_us)
 
     players_per_group = get_models_module(app_name).Constants.players_per_group
+ 
     left_to_wait = players_per_group - how_many_arrived
 
     textforgroup = json.dumps({

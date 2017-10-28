@@ -7,11 +7,9 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
 from otree.api import Currency as c, currency_range
-# from otree.api import models as m
-<<<<<<< HEAD
+
+
 from .models import Constants, Mturk, WPJobRecord, WPTimeRecord
-=======
->>>>>>> d1c9c1996320d94f915be6d1c1eceabfa84dafa2
 from otree.common import safe_json
 from otree.views.abstract import get_view_from_url
 from otree.api import widgets

@@ -1,0 +1,58 @@
+  <style>
+                th, td {
+                    padding: 4px 6px 4px 6px;
+                }
+
+                table#box1 {
+                    background-color: #ecf2f9;
+                }
+
+                table#box2 {
+                    background-color: #ecf2f9;
+                }
+            </style>
+
+
+        <p>
+            Your task is to first find <b>the largest number in each of the two boxes</b> and then <b>add up the two
+            numbers</b>. <br>
+            Submit your answer in the box below.
+        </p>
+
+        <table style="width:100%">
+            <tr>
+                <th class="box-heading"> Box 1</th>
+                <th></th>
+                <th class="box-heading"> Box 2</th>
+            </tr>
+            <tr>
+
+                <!-- NEST ANOTHER TABLE! -->
+                <td class="table-borders">
+                    <table class="table-style" style="width:99%" id="box1">
+                    </table>
+                </td>
+
+                <!-- Some space -->
+                <td>
+
+                </td>
+                <!-- NEST ANOTHER TABLE! -->
+                <td class="table-borders">
+                    <table class="table-style" style="width:99%" id="box2">
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <div class="form-group   form-inline">
+            <label for="answer">Your answer is:
+                <input type="number" class="form-control answer" id="answer" required>
+            </label>
+            <button type="submit" class="btn btn-success answer">Answer</button>
+        </div>
+
+
+        <p> Tasks attempted so far: <span id="tasks_attempted">{{ player.tasks_attempted }}</span></p>
+        <p> Tasks correct so far: <span id="tasks_correct"> {{ player.tasks_correct }}</span></p>

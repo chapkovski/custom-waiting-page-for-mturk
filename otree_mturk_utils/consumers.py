@@ -1,7 +1,7 @@
 from channels import Group
 from channels.sessions import channel_session
 import random
-from .models import Mturk, WPJobRecord, WPTimeRecord
+from .models import Mturk, WPJobRecord, WPTimeRecord, ROWS, BigFiveData
 import json
 import random
 from random import randint
@@ -76,6 +76,8 @@ def ws_connect(message, participant_code, app_name, group_pk, player_pk, index_i
     wprecord, created = mturker.wpjobrecord_set.get_or_create(app=app_name, page_index=index_in_pages)
     wprecord.last_correct_answer = new_task['correct_answer']
     wprecord.save()
+    new_task['tasks_correct'] = wprecord.tasks_correct
+    new_task['tasks_attempted'] = wprecord.tasks_attempted
     message.reply_channel.send({'text': json.dumps(new_task)})
 
     Group('group_{}'.format(group_pk)).add(message.reply_channel)
@@ -122,3 +124,36 @@ def ws_disconnect(message, participant_code, app_name, group_pk, player_pk, inde
     print('somebody disconnected...')
     Group('group_{}'.format(group_pk)).discard(message.reply_channel)
     send_message(message, app_name, group_pk, gbat, index_in_pages)
+
+
+
+
+import json
+
+
+
+def big_connect(message, participant_code):
+    print('connected')
+
+
+def big_message(message, participant_code):
+    jsonmessage = json.loads(message.content['text'])
+    print("json:::", jsonmessage)
+
+    dictionary = jsonmessage['answers']
+    answer_vector = []
+    num_questions=len(ROWS)
+    for i in range(0, num_questions):
+        try:
+            answer_vector.append(dictionary[str(i)])
+        except KeyError:
+            answer_vector.append("0")
+
+    data, created = BigFiveData.objects.get_or_create(Participant__code=participant_code)
+    data.bigfive = answer_vector
+    data.save()
+    print("bigfive::::", data.bigfive)
+
+
+def big_disconnect(message, participant_code):
+    print('disconnected')

@@ -1,25 +1,30 @@
-from . import models
-from ._builtin import Page, WaitPage
-from otree.api import Currency as c, currency_range
-# from otree.api import models as m
-from .models import Constants, Mturk, WPJobRecord, WPTimeRecord
-from otree.common import safe_json
-from otree.views.abstract import get_view_from_url
-from otree.api import widgets
+
+import time
+import channels
+import json
 import random
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied
+from otree.api import Currency as c, currency_range
+# from otree.api import models as m
+<<<<<<< HEAD
+from .models import Constants, Mturk, WPJobRecord, WPTimeRecord
+=======
+>>>>>>> d1c9c1996320d94f915be6d1c1eceabfa84dafa2
+from otree.common import safe_json
+from otree.views.abstract import get_view_from_url
+from otree.api import widgets
 from otree.models_concrete import (
     PageCompletion, CompletedSubsessionWaitPage,
     CompletedGroupWaitPage, PageTimeout, UndefinedFormModel,
     ParticipantLockModel, GlobalLockModel, ParticipantToPlayerLookup
 )
 from otree.models import Participant
-import time
-import channels
-import json
+from . import models
+from ._builtin import Page, WaitPage
+from .models import Constants, Player
+
 
 
 
@@ -68,8 +73,9 @@ class CustomWaitPage(WaitPage):
         if self.request.method == 'POST':
             now = time.time()
             time_left = curparticipant.vars.get("startwp_time", 0 ) + Constants.startwp_timer - now
-            if time_left > 0 :
-                raise PermissionDenied
+            if time_left > 0:
+                url_should_be_on = curparticipant._url_i_should_be_on()
+                return HttpResponseRedirect(url_should_be_on)
             curparticipant.vars['go_to_the_end'] = True
             curparticipant.save()
         return super().dispatch(*args, **kwargs)

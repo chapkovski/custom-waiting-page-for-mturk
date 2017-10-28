@@ -2,7 +2,7 @@ from . import models
 from ._builtin import Page, WaitPage
 from otree.api import Currency as c, currency_range
 # from otree.api import models as m
-from .models import Constants, Player
+from .models import Constants, Mturk, WPJobRecord, WPTimeRecord
 from otree.common import safe_json
 from otree.views.abstract import get_view_from_url
 from otree.api import widgets
@@ -77,16 +77,19 @@ class CustomWaitPage(WaitPage):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         from django.core.urlresolvers import resolve
-
+        app_name = self.player._meta.app_label
+        index_in_pages = self._index_in_pages
         now = time.time()
-        if not self.participant.mturk.startwp_timer_set:
-            self.participant.mturk.startwp_timer_set = True
-            self.participant.mturk.startwp_time = time.time()
-        time_left = self.participant.mturk.startwp_time + Constants.startwp_timer - now
+        wptimerecord, created = self.participant.mturk.wptimerecord_set.get_or_create(app=app_name, page_index=index_in_pages)
+        if not wptimerecord.startwp_timer_set:
+            wptimerecord.startwp_timer_set = True
+            wptimerecord.startwp_time = time.time()
+            wptimerecord.save()
+        time_left = wptimerecord.startwp_time + Constants.startwp_timer - now
         context.update({
-            'index_in_pages': self._index_in_pages,
+            'index_in_pages':index_in_pages,
             'time_left': round(time_left),
-            'app_name': self.player._meta.app_label
+            'app_name': app_name
         })
         return context
 

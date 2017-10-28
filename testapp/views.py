@@ -21,5 +21,6 @@ class Results(CustomPage):
 page_sequence = [
     MyPage,
     ResultsWaitPage,
-    Results
+    Results,
+    ResultsWaitPage,
 ]

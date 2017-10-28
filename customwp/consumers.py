@@ -1,7 +1,7 @@
 from channels import Group
 from channels.sessions import channel_session
 import random
-from .models import Constants, Mturk
+from .models import Constants, Mturk, WPJobRecord, WPTimeRecord
 import json
 import random
 from random import randint
@@ -9,9 +9,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from otree.models import Participant
 from importlib import import_module
 
+
 def get_models_module(app_name):
     module_name = '{}.models'.format(app_name)
     return import_module(module_name)
+
 
 # ============= For creating a task
 def slicelist(l, n):
@@ -40,8 +42,7 @@ def get_task():
     }
 
 
-def send_message(message,app_name, group_pk, gbat, index_in_pages):
-
+def send_message(message, app_name, group_pk, gbat, index_in_pages):
     those_with_us = get_models_module(app_name).Player.objects.filter(
         group__pk=group_pk,
         participant__mturk__current_wp=index_in_pages,
@@ -58,45 +59,47 @@ def send_message(message,app_name, group_pk, gbat, index_in_pages):
     })
 
 
-def ws_connect(message, participant_code,app_name, group_pk, player_pk, index_in_pages, gbat):
+def ws_connect(message, participant_code, app_name, group_pk, player_pk, index_in_pages, gbat):
     print('somebody connected...')
     try:
         mturker = Mturk.objects.get(Participant__code=participant_code)
     except ObjectDoesNotExist:
         return None
     mturker.current_wp = index_in_pages
-    new_task = get_task()
-    mturker.last_correct_answer = new_task['correct_answer']
     mturker.save()
+    new_task = get_task()
+    wprecord, created = mturker.wpjobrecord_set.get_or_create(app=app_name, page_index=index_in_pages)
+    wprecord.last_correct_answer = new_task['correct_answer']
+    wprecord.save()
     message.reply_channel.send({'text': json.dumps(new_task)})
 
     Group('group_{}'.format(group_pk)).add(message.reply_channel)
     send_message(message, app_name, group_pk, gbat, index_in_pages)
 
 
-def ws_message(message, participant_code, app_name,group_pk, player_pk, index_in_pages, gbat):
+def ws_message(message, participant_code, app_name, group_pk, player_pk, index_in_pages, gbat):
     jsonmessage = json.loads(message.content['text'])
     answer = jsonmessage.get('answer')
     if answer:
         try:
-            player =get_models_module(app_name).Player.objects.get(pk=player_pk, participant__code=participant_code)
+            mturker= Mturk.objects.get(Participant__code=participant_code)
+            wprecord = WPJobRecord.objects.get(mturker=mturker,
+                                            page_index=index_in_pages,
+                                            app=app_name)
         except ObjectDoesNotExist:
             return None
 
-        add_one(player, "tasks_attempted")
+        wprecord.tasks_attempted += 1
 
-        player.tasks_attempted += 1
-        if int(answer) == int(player.last_correct_answer):
-            player.tasks_correct += 1
-            add_one(player, "tasks_correct")
+        if int(answer) == int(wprecord.last_correct_answer):
+            wprecord.tasks_correct += 1
 
         new_task = get_task()
-        new_task['tasks_correct'] = player.tasks_correct
-        new_task['tasks_attempted'] = player.tasks_attempted
-        player.last_correct_answer = new_task['correct_answer']
-        player.save()
+        new_task['tasks_correct'] = wprecord.tasks_correct
+        new_task['tasks_attempted'] = wprecord.tasks_attempted
+        wprecord.last_correct_answer = new_task['correct_answer']
+        wprecord.save()
         message.reply_channel.send({'text': json.dumps(new_task)})
-
 
 
 # Connected to websocket.disconnect
@@ -110,11 +113,4 @@ def ws_disconnect(message, participant_code, app_name, group_pk, player_pk, inde
     mturker.save()
     print('somebody disconnected...')
     Group('group_{}'.format(group_pk)).discard(message.reply_channel)
-    send_message(message, app_name,group_pk, gbat, index_in_pages)
-
-
-def add_one(player, name_of_the_record):
-    var = player.participant.vars.get(name_of_the_record, 0) + 1
-    player.participant.vars[name_of_the_record] = var
-
-
+    send_message(message, app_name, group_pk, gbat, index_in_pages)

@@ -21,32 +21,43 @@ from otree.models_concrete import (
 from otree.models import Participant
 from . import models
 from ._builtin import Page, WaitPage
-from .models import Constants, Player
+from .models import Constants
 
 
 
 
-class CustomPage(Page):
+class DecorateIsDisplayMixin(object):
+
     def extra_condition_to_decorate_is_display(self):
-        return not self.player.participant.vars.get('go_to_the_end', False)
+        # can be overriden, if necessary
+        return True
+
+    def extra_task_to_execute_with_is_display(self):
+        pass
 
     def __init__(self):
-        super(CustomPage, self).__init__()
+        super(DecorateIsDisplayMixin, self).__init__()
 
         # We need to edit is_displayed() method dynamically, when creating an instance, since custom use is that it is overriden in the last child
         def decorate_is_displayed(func):
             def decorated_is_display(*args, **kwargs):
                 game_condition = func(*args, **kwargs)
                 # we need to first run them both separately to make sure that both conditions are executed
+                self.extra_task_to_execute_with_is_display()
                 second_condition = self.extra_condition_to_decorate_is_display()
-                return game_condition and second_condition
+                return game_condition and not self.player.participant.vars.get('go_to_the_end', False) and second_condition
 
             return decorated_is_display
 
         setattr(self, "is_displayed", decorate_is_displayed(getattr(self, "is_displayed")))
 
 
-class CustomWaitPage(WaitPage):
+
+class CustomPage(DecorateIsDisplayMixin , Page):
+    pass
+
+
+class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
     # Base Mixin... must be used for ALL players pages of our site!!!
     template_name = 'customwp/FirstWaitPage.html'
     use_real_effort_task = False
@@ -84,6 +95,10 @@ class CustomWaitPage(WaitPage):
         app_name = self.player._meta.app_label
         index_in_pages = self._index_in_pages
         now = time.time()
+
+
+
+
         wptimerecord, created = self.participant.mturk.wptimerecord_set.get_or_create(app=app_name, page_index=index_in_pages)
         if not wptimerecord.startwp_timer_set:
             wptimerecord.startwp_timer_set = True
@@ -103,24 +118,11 @@ class CustomWaitPage(WaitPage):
     def extra_task_to_decorate_start_of_after_all_players_arrive(self):
         ...
 
-    def extra_condition_to_decorate_is_display(self):
+    def extra_task_to_execute_with_is_display(self):
         self.participant.vars.setdefault('starting_time_stamp_{}'.format(self._index_in_pages), time.time())
-        return not self.player.participant.vars.get('go_to_the_end', False)
 
     def __init__(self):
         super(CustomWaitPage, self).__init__()
-
-        # We need to edit is_displayed() method dynamically, when creating an instance, since custom use is that it is overriden in the last child
-        def decorate_is_displayed(func):
-            def decorated_is_display(*args, **kwargs):
-                game_condition = func(*args, **kwargs)
-                # we need to first run them both separately to make sure that both conditions are executed
-                second_condition = self.extra_condition_to_decorate_is_display()
-                return game_condition and second_condition
-
-            return decorated_is_display
-
-        setattr(self, "is_displayed", decorate_is_displayed(getattr(self, "is_displayed")))
 
         # IS A WAIT PAGE
         def decorate_after_all_players_arrive(func):
@@ -146,23 +148,3 @@ class CustomWaitPage(WaitPage):
                 self.set_waiting_page_payoff(p)
 
 
-class StartWP(CustomWaitPage):
-    group_by_arrival_time = True
-    use_real_effort_task = True
-    pay_by_task = 1.5
-
-
-class Intro(CustomPage):
-    ...
-
-
-class Results(CustomPage):
-    ...
-
-
-page_sequence = [
-    StartWP,
-    Intro,
-    CustomWaitPage,
-    Results,
-]

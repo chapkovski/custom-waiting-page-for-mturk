@@ -9,7 +9,7 @@ from django.dispatch import receiver
 
 
 doc = """
-...testing timer on waiting page
+Custom Waiting Pages and Pages for mTurk
 """
 
 
@@ -47,10 +47,8 @@ def save_participant(sender, instance, **kwargs):
 
 
 
+
 class Constants(BaseConstants):
-    name_in_url = 'customwp'
-    players_per_group = 3
-    num_rounds = 1
     # the startwp_timer defines how long the player has to wait at the
     # first waiting page
     # before he or she has an option to finish the game without waiting for
@@ -58,20 +56,20 @@ class Constants(BaseConstants):
     startwp_timer = 15
 
 
-class Subsession(BaseSubsession):
-    not_enough_players = models.BooleanField(
-        doc=""" this variable set to True when one of the players decide to
-        abandon the game (because he is tired to wait), and
-        there is no enough players left in the session to complete the group.
-        then those remaining get the opportunity to finish the game.""",
-        initial=False
-    )
+# class Subsession(BaseSubsession):
+#     not_enough_players = models.BooleanField(
+#         doc=""" this variable set to True when one of the players decide to
+#         abandon the game (because he is tired to wait), and
+#         there is no enough players left in the session to complete the group.
+#         then those remaining get the opportunity to finish the game.""",
+#         initial=False
+#     )
 
 
-class Group(BaseGroup):
-    ...
+# class Group(BaseGroup):
+#     ...
 
 
-class Player(BasePlayer):
-    ...
+# class Player(BasePlayer):
+#     ...
 

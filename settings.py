@@ -144,17 +144,16 @@ SESSION_CONFIGS = [
 
     #
     {
-        'name': 'customwp',
-        'display_name': "Testing timeout on waiting page",
-        'num_demo_participants': 3,
-        'app_sequence': ['customwp'],
-    },
-
-    {
         'name': 'test',
         'display_name': "testing indep. app",
         'num_demo_participants': 3,
         'app_sequence': ['testapp'],
+    },
+    {
+        'name': 'test2',
+        'display_name': "Testing timeout on waiting page",
+        'num_demo_participants': 3,
+        'app_sequence': ['testapp2'],
     },
 
 ]

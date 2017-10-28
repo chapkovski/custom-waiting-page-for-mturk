@@ -53,11 +53,11 @@ class DecorateIsDisplayMixin(object):
 
 
 
-class CustomPage(DecorateIsDisplayMixin , Page):
+class CustomMturkPage(DecorateIsDisplayMixin , Page):
     pass
 
 
-class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
+class CustomMturkWaitPage(DecorateIsDisplayMixin , WaitPage):
     # Base Mixin... must be used for ALL players pages of our site!!!
     template_name = 'otree_mturk_utils/CustomWaitPage.html'
     use_real_effort_task = False
@@ -123,7 +123,7 @@ class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
         self.participant.vars.setdefault('starting_time_stamp_{}'.format(self._index_in_pages), time.time())
 
     def __init__(self):
-        super(CustomWaitPage, self).__init__()
+        super(CustomMturkWaitPage, self).__init__()
 
         # IS A WAIT PAGE
         def decorate_after_all_players_arrive(func):

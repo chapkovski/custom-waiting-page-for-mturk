@@ -2,13 +2,13 @@ from otree.api import Currency as c, currency_range
 from . import models
 from ._builtin import Page, WaitPage
 from .models import Constants
-from otree_mturk_utils.views import CustomPage, CustomWaitPage
+from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
 
-class MyPage(CustomPage):
+class MyPage(CustomMturkPage):
     pass
 
 
-class ResultsWaitPage(CustomWaitPage):
+class ResultsWaitPage(CustomMturkWaitPage):
     use_real_effort_task = True
     startwp_timer = 12
     
@@ -16,7 +16,7 @@ class ResultsWaitPage(CustomWaitPage):
         pass
 
 
-class Results(CustomPage):
+class Results(CustomMturkPage):
     pass
 
 

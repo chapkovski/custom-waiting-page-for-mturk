@@ -10,6 +10,8 @@ class MyPage(CustomPage):
 
 class ResultsWaitPage(CustomWaitPage):
     use_real_effort_task = True
+    startwp_timer = 12
+    
     def after_all_players_arrive(self):
         pass
 

@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from otree.api import Currency as c, currency_range
 
 
-from .models import Constants, Mturk, WPJobRecord, WPTimeRecord
+from .models import Mturk, WPJobRecord, WPTimeRecord
 from otree.common import safe_json
 from otree.views.abstract import get_view_from_url
 from otree.api import widgets
@@ -21,7 +21,7 @@ from otree.models_concrete import (
 from otree.models import Participant
 from . import models
 from ._builtin import Page, WaitPage
-from .models import Constants
+
 
 
 
@@ -63,6 +63,7 @@ class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
     use_real_effort_task = False
     pay_by_task = 0
     pay_by_time = 0
+    startwp_timer = 15
 
     def set_waiting_page_payoff(self, p):
         p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())
@@ -81,7 +82,7 @@ class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
 
         if self.request.method == 'POST':
             now = time.time()
-            time_left = curparticipant.vars.get("startwp_time", 0 ) + Constants.startwp_timer - now
+            time_left = curparticipant.vars.get("startwp_time", 0 ) + self.startwp_timer - now
             if time_left > 0:
                 url_should_be_on = curparticipant._url_i_should_be_on()
                 return HttpResponseRedirect(url_should_be_on)
@@ -104,7 +105,7 @@ class CustomWaitPage(DecorateIsDisplayMixin , WaitPage):
             wptimerecord.startwp_timer_set = True
             wptimerecord.startwp_time = time.time()
             wptimerecord.save()
-        time_left = wptimerecord.startwp_time + Constants.startwp_timer - now
+        time_left = wptimerecord.startwp_time + self.startwp_timer - now
         context.update({
             'index_in_pages':index_in_pages,
             'time_left': round(time_left),

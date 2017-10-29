@@ -51,7 +51,7 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
     pay_by_task = 0
     pay_by_time = 0
     startwp_timer = 7200
-    task = 'survey' # 'survey' #'real_effort' # choice between 'survey' and 'real_effort'
+    task = 'real_effort' # choice between 'survey' and 'real_effort'
 
     def set_waiting_page_payoff(self, p):
         p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())

@@ -35,7 +35,6 @@
             var obj = JSON.parse(event.data);
             if (obj.hasOwnProperty('message_type')) {
                 if (obj.message_type == 'new_task') {
-                    {% if view.use_real_effort_task %}
                         $('span#correct_answer').html(obj.correct_answer);
                         $('span#tasks_attempted').html(obj.tasks_attempted);
                         $('span#tasks_correct').html(obj.tasks_correct);
@@ -57,7 +56,6 @@
                         });
 
                         var obj = jQuery.parseJSON(event.data);
-                    {% endif %}
                 }
                 else {
                     if (obj.hasOwnProperty('left_to_wait')) {

@@ -49,27 +49,26 @@ What does the default custom wait page do?
 ******************************************
 
 The custom wait page was created to allow participants to wait for a group to form,
- to ensure that they remain available and ready to start the experiment while they wait,
- and to let them finish the experiment if the waiting lasts for too long.
+to ensure that they remain available and ready to start the experiment while they wait,
+and to let them finish the experiment if the waiting lasts for too long.
 
 The experimenter can require the participant to do an activity while he waits,
 by setting an attribute of the page (here use_real_effort_task = True ,
 to have a real effort task). The main goal of this activity is to have the participant
- stay focused on the experiment while he waits. But be careful, as soon as a group is formed,
- the members of the group will be forwarded to the next page, even if they are in the middle of a page.
-  This could create frustration if not anticipated, so you should warn the participants in the instructions.
-  (If the task is to answer a survey, they will be offered to complete the survey at the end of the experiment,
-  their previous answers will be saved.)
+stay focused on the experiment while he waits. But be careful, as soon as a group is formed,
+the members of the group will be forwarded to the next page, even if they are in the middle of a page.
+This could create frustration if not anticipated, so you should warn the participants in the instructions.
+(If the task is to answer a survey, they will be offered to complete the survey at the end of the experiment,
+their previous answers will be saved.)
 
 You can decide to pay the participant based on his wait time and on his “score” in the effort
-task by setting the attributes pay_by_task and pay_by_time in your waitpage (by default, this is 0)
-. At the end of the experiment, you will find this additional payment in participants.vars[‘payment_for_wait’]
+task by setting the attributes pay_by_task and pay_by_time in your waitpage (by default, this is 0). At the end of the experiment, you will find this additional payment in participants.vars[‘payment_for_wait’]
 
 The experimenter can also set a limit of time after which a player is offered to complete the study
 if he wants (by specifying the attribute “time_before_exit_offer”, labelled in minutes, which is by default
- equal to 2 hours). This is hidden if more than 30 minutes. By clicking on “finish the study”, the participant will skip
- all the CustomMturkPage and CustomMturkWaitPage pages in the remaining app sequence (if you want him to complete a survey
- in a final app, just do not inherit the survey pages from CustomMturkPage).
+equal to 2 hours). This is hidden if more than 30 minutes. By clicking on “finish the study”, the participant will skip
+all the CustomMturkPage and CustomMturkWaitPage pages in the remaining app sequence (if you want him to complete a survey
+in a final app, just do not inherit the survey pages from CustomMturkPage).
 
 Maybe in a later version, we will offer the option to skip only the current round or the current app,
 and not necessarily all the remaining CustomMturkPage and CustomMturkWaitPage of the session.

@@ -1,0 +1,3 @@
+include README.rst
+graft otree_mturk_utils/_buildin
+graft otree_mturk_utils/templates/*

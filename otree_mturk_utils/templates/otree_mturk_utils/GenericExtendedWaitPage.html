@@ -1,0 +1,36 @@
+{% extends 'otree/WaitPage.html' %}
+{% load staticfiles otree_tags %}
+
+
+
+
+{% comment %}
+
+        If you want to add your own behaviour to the custom wait page, for example, in order to "smooth" the exit of the page when a group is formed, you can replace all the content of this page, including the extension declaration at the top of it, with the complete content of the WaitPage that you can find in WaitPage of the otree core installation that you are using (the template that this file currently extends).
+
+        For now, you can find that otree core version, for the last version, at this address: https://github.com/oTree-org/otree-core/blob/master/otree/templates/otree/WaitPage.html
+
+        Then you can add your own content, for example in the socket.onmessage part, if you want something special to happen, when the page receives the signal that a group has been formed.
+
+        Be careful, the WaitPage in otree core can change from an oTree version to another: If you update otree core, you might need to adapt this page, with the new otree core WaitPage.html.
+
+        You will find an example, in GenericExtendedWaitPageExample1ForOTree140.html, that is based on the WaitPage of oTree core 140. This is just a quick and dirty extension, that only shows an ugly alert box, in order to warn the participant that he will be forwarded to the next page, when the group is matched
+        ((just added: "alert('Enough persons have arrived, you will be transfered to the next page; You will be invited to finish your study at the end of the experiment');"))
+
+        In the second example, GenericExtendedWaitPageExample2ForOTree140.html, a hidden message is shown via 
+                <div class="well" id="show-when-group-is-formed" style="display:none; color:red;">
+                    <b>Enough persons have arrived, you will be transfered to the next page; You will be invited to finish your study at the end of the experiment.</b>
+                </div>
+
+                and
+                $("#show-when-group-is-formed").show();
+
+        and the redirection is delayed by 10s (10 000 ms)
+            window.setInterval(function() {
+                  window.location.href = '{{ view.redirect_url|safe }}';
+                }, 10000);
+        instead of just
+                 window.location.href = '{{ view.redirect_url|safe }}';
+
+{% endcomment %}
+

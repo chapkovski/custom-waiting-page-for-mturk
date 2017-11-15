@@ -1,14 +1,12 @@
 from channels import Group
-from channels.sessions import channel_session
-import random
 from .models import Mturk, WPJobRecord, WPTimeRecord, ROWS, BigFiveData
-import json
-import random
 from random import randint
+from otree.models import Participant
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from otree.models import Participant
+
 from importlib import import_module
+import json
 
 
 def get_models_module(app_name):
@@ -49,7 +47,7 @@ def send_message(message, app_name, group_pk, gbat, index_in_pages):
         participant__mturk__current_wp=index_in_pages,
     )
     how_many_arrived = len(those_with_us)
-
+    print('HOW MANY ARRIVED:', how_many_arrived)
     players_per_group = get_models_module(app_name).Constants.players_per_group
  
     left_to_wait = players_per_group - how_many_arrived
@@ -65,11 +63,12 @@ def send_message(message, app_name, group_pk, gbat, index_in_pages):
 
 
 def ws_connect(message, participant_code, app_name, group_pk, player_pk, index_in_pages, gbat):
-    print('somebody connected...')
+    print('somebody connected from custom wp..')
     try:
         mturker = Mturk.objects.get(Participant__code=participant_code)
     except ObjectDoesNotExist:
         return None
+
     mturker.current_wp = index_in_pages
     mturker.save()
     new_task = get_task()
@@ -128,7 +127,6 @@ def ws_disconnect(message, participant_code, app_name, group_pk, player_pk, inde
 
 
 
-import json
 
 
 

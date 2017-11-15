@@ -1,32 +1,28 @@
-
-
-
-
 <script>
 
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
     var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/waiting_page/{{participant.code}}/{{ app_name }}/{{ group.pk }}/{{ player.pk }}/{{index_in_pages}}/{% if view.group_by_arrival_time%}1{% else %}0{% endif %}");
 
-        // Handle any errors that occur.
-        wpsocket.onerror = function (error) {
-            console.log('WebSocket Error: ' + error);
-        };
+    // Handle any errors that occur.
+    wpsocket.onerror = function (error) {
+        console.log('WebSocket Error: ' + error);
+    };
 
-        // Show a connected message when the WebSocket is opened.
-        wpsocket.onopen = function (event) {
-            console.log('connected to oTree');
-            console.log(event.data);
-        };
+    // Show a connected message when the WebSocket is opened.
+    wpsocket.onopen = function (event) {
+        console.log('connected to oTree');
+        console.log(event.data);
+    };
 
-
-     {% include  task_to_show.js %}
-
-        // Show a disconnected message when the WebSocket is closed.
-        wpsocket.onclose = function (event) {
-            console.log('disconnected from oTree');
-        };
-
-
+    {% if use_task %}
+        {% include task_to_show.js %}
+    {% else %}
+        {% include 'otree_mturk_utils/NoTask.js' %}
+    {% endif %}
+    // Show a disconnected message when the WebSocket is closed.
+    wpsocket.onclose = function (event) {
+        console.log('disconnected from oTree');
+    };
 
 
 </script>

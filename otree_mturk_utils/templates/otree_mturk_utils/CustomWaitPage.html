@@ -16,15 +16,12 @@
 {% endblock %}
 {% block content %}
     <div class="your-clock"></div>
-    {% comment %}
-        Can be used to display how many participants are missing, if the matching logic is simple (i.e. a fixed number of players, and no types)
-        Otherwise, do not use, it might show things like 5 participants are missing waiting for -1 more, for groups of 4, if the types that have arrived do not correspond to the composition of the groups
         <div><b><span id="how_many_arrived"></span>/{{ Constants.players_per_group }}</b> participants are
             already here...
         </div>
         <div>Waiting for <span id="left_to_wait"></span> more <span id="left_to_wait_people"></span>...</div>
         <br/>
-    {% endcomment %}
+
 
     <div id="otree-timeout-warning" class="alert alert-warning" style="display:block;">
         <p>You can finish the study if nobody arrives in:
@@ -44,9 +41,10 @@
         </div>
         <br>
     </form>
-
+{% if use_task %}
     {% include task_to_show.html %}
 
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

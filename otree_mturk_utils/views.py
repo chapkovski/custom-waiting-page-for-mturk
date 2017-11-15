@@ -80,7 +80,6 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        from django.core.urlresolvers import resolve
         app_name = self.player._meta.app_label
         index_in_pages = self._index_in_pages
         now = time.time()
@@ -93,27 +92,31 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
             wptimerecord.save()
         time_left = wptimerecord.startwp_time + self.startwp_timer - now
         time_passed = now - wptimerecord.startwp_time
-        if self.task == 'real_effort':
-            task_to_show = 'otree_mturk_utils/RealEffortTask'
-        else:
-            task_to_show = 'otree_mturk_utils/BigFive'
-            num_questions = len(models.ROWS)
-            f = BigFiveForm()
-            data, created = models.BigFiveData.objects.get_or_create(Participant=self.player.participant)
-            if created:
-                old_data = []
+        if self.use_task:
+            if self.task == 'real_effort':
+                task_to_show = 'otree_mturk_utils/RealEffortTask'
             else:
-                old_data = data.bigfive
-            context.update({'num_questions': num_questions,
-                            'old_data': old_data,
-                            'myform': f})
-        task_to_show = {'js': '{}.js'.format(task_to_show), 'html': '{}.html'.format(task_to_show)}
+                task_to_show = 'otree_mturk_utils/BigFive'
+                num_questions = len(models.ROWS)
+                f = BigFiveForm()
+                data, created = models.BigFiveData.objects.get_or_create(Participant=self.player.participant)
+                if created:
+                    old_data = []
+                else:
+                    old_data = data.bigfive
+                context.update({'num_questions': num_questions,
+                                'old_data': old_data,
+                                'myform': f})
+            task_to_show = {'js': '{}.js'.format(task_to_show), 'html': '{}.html'.format(task_to_show)}
+            context.update({
+                'task_to_show': task_to_show,
+            })
         context.update({
+            'use_task':self.use_task,
             'index_in_pages': index_in_pages,
             'time_left': round(time_left),
             'time_passed': round(time_passed),
             'app_name': app_name,
-            'task_to_show': task_to_show,
         })
         return context
 

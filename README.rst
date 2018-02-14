@@ -23,7 +23,13 @@ Installation:
     ]
 You will also need to install radiogrid, which is used in one of the 2 tasks. Type ``pip install django-radiogrid`` in your terminal.
 
-4. In the ``views.py`` file of your project, import the pages::
+4. If you use oTree version 2, add "otree_mturk_utils" to your EXTENSION_APPS section of ``settings.py`` file like this::
+
+    EXTENSION_APPS  = [
+        'otree_mturk_utils',
+    ]
+
+5. In the ``views.py`` file of your project, import the pages::
 
     from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
 

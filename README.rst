@@ -1,5 +1,5 @@
 ========================================================================
-Custom Waiting Page for mTurk experiments with oTree (v. 1.3 or 1.4)
+Custom Waiting Page for mTurk experiments with oTree
 ========================================================================
 
 This project is a collaboration between Essi Kujansuu (EUI), Nicolas Gruyer (`Economics Games <https://economics-games.com>`_) and Philipp Chapkovski (UZH).

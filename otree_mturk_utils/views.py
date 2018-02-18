@@ -1,11 +1,14 @@
 import time
-from django.http import HttpResponseRedirect, Http404, HttpResponse
+import ast
 
+from django.http import HttpResponseRedirect, Http404, HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import ModelForm
+
+from otree.common_internal import get_models_module
 from otree.models import Participant
 from . import models
-from django.forms import ModelForm
 from ._builtin import Page, WaitPage
-import ast
 
 
 class BigFiveForm(ModelForm):
@@ -44,8 +47,9 @@ class DecorateIsDisplayMixin(object):
 class CustomMturkPage(DecorateIsDisplayMixin, Page):
     pass
 
-class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
-    # Base Mixin... must be used for ALL players pages of our site!!!
+
+class CustomMturkWaitPage(WaitPage):
+    # Only for the first, grouping wait page of the app
     template_name = 'otree_mturk_utils/CustomWaitPage.html'
 
     # Deault attributes
@@ -61,6 +65,9 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
 
     task = 'real_effort' # choice between 'survey' and 'real_effort'
 
+    group_by_arrival_time = True
+
+
     def set_waiting_page_payoff(self, p):
         p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())
         current_paying_time = p.participant.vars.get('ending_time_stamp_{}'.format(self._index_in_pages), 0) - \
@@ -68,9 +75,18 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
         p.participant.vars['total_waiting_time'] = p.participant.vars.get('total_waiting_time',
                                                                           0) + current_paying_time
 
-        p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait',
-                                                                        0) + p.participant.vars.get(
-            "tasks_correct", 0) * self.pay_by_task + current_paying_time * self.pay_by_time
+        correct_tasks = 0
+        attempted_tasks = 0
+        try:
+            mturker = models.Mturk.objects.get(Participant__code=p.participant.code)
+            wprecord= mturker.wpjobrecord_set.get(app=p._meta.app_label, page_index=self._index_in_pages)
+            correct_tasks = wprecord.tasks_correct
+            attempted_tasks = wprecord.tasks_attempted
+        except ObjectDoesNotExist:
+            pass
+
+        p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait',0) + correct_tasks * self.pay_by_task + current_paying_time * self.pay_by_time
+   
 
     def dispatch(self, *args, **kwargs):
 
@@ -131,6 +147,7 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
             context.update({
                 'task_to_show': task_to_show,
             })
+
         context.update({
             'use_task':self.use_task,
             'index_in_pages': index_in_pages,
@@ -140,11 +157,13 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
         })
         return context
 
-    def extra_task_to_decorate_start_of_after_all_players_arrive(self):
-        ...
 
-    def extra_task_to_execute_with_is_display(self):
-        self.participant.vars.setdefault('starting_time_stamp_{}'.format(self._index_in_pages), time.time())
+
+
+
+
+
+
 
     def __init__(self):
         super(CustomMturkWaitPage, self).__init__()
@@ -161,6 +180,62 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
         setattr(self, "after_all_players_arrive",
                 decorate_after_all_players_arrive(getattr(self, "after_all_players_arrive")))
 
+
+
+
+        # We need to edit is_displayed() method dynamically, when creating an instance, since custom use is that it is overriden in the last child
+        def decorate_is_displayed(func):
+            def decorated_is_display(*args, **kwargs):
+                game_condition = func(*args, **kwargs)
+                # we need to first run them both separately to make sure that both conditions are executed
+                self.extra_task_to_execute_with_is_display()
+                return game_condition 
+            return decorated_is_display
+
+        setattr(self, "is_displayed", decorate_is_displayed(getattr(self, "is_displayed")))
+
+
+        def decorate_get_players_for_group(func):
+            def decorated_get_players_for_group(*args, **kwargs):
+                grouped = self.extra_task_to_decorate_start_of_get_players_for_group(*args, **kwargs)
+                if grouped:
+                    # form groups of only one when a players decides to finish the experiment--> otherwise , there might be problems later during ordinary wait pages
+                    return grouped[0:1]
+                grouped = func(*args, **kwargs)
+                if grouped:
+                    return grouped
+                grouped = self.extra_task_to_decorate_end_of_get_players_for_group(*args, **kwargs)
+                if grouped:
+                    return grouped
+
+            return decorated_get_players_for_group
+
+        setattr(self, "get_players_for_group",
+                decorate_get_players_for_group(getattr(self, "get_players_for_group")))
+
+
+
+    def extra_task_to_decorate_start_of_get_players_for_group(self, waiting_players):
+        app_name = self.subsession._meta.app_label
+        round_number = self.subsession.round_number
+        endofgamers = [p for p in waiting_players if (
+            p.participant.vars.get('go_to_the_end') or p.participant.vars.get('skip_the_end_of_app_{}'.format(app_name)) or p.participant.vars.get('skip_the_end_of_app_{}_round_{}'.format(app_name , round_number))
+            )]
+        if endofgamers:
+            return endofgamers
+
+
+    def extra_task_to_decorate_end_of_get_players_for_group(self, waiting_players):
+        app_name = self.subsession._meta.app_label
+        if len(waiting_players) == get_models_module(app_name).Constants.players_per_group:
+            return waiting_players
+
+
+
+    def extra_task_to_decorate_start_of_after_all_players_arrive(self):
+        ...
+
+
     def extra_task_to_decorate_end_of_after_all_players_arrive(self):
         if self.wait_for_all_groups:
             players = self.subsession.get_players()
@@ -171,3 +246,12 @@ class CustomMturkWaitPage(DecorateIsDisplayMixin, WaitPage):
             players = self.group.get_players()
             for p in players:
                 self.set_waiting_page_payoff(p)
+
+
+    def extra_task_to_execute_with_is_display(self):
+        self.participant.vars.setdefault('starting_time_stamp_{}'.format(self._index_in_pages), time.time())
+
+
+
+
+        

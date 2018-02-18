@@ -152,7 +152,7 @@ SESSION_CONFIGS = [
     {
         'name': 'test2',
         'display_name': "Testing timeout on waiting page",
-        'num_demo_participants': 4,
+        'num_demo_participants': 6,
         'app_sequence': ['testapp2'],
     },
 

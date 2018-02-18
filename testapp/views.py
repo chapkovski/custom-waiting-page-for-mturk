@@ -4,13 +4,13 @@ from ._builtin import Page, WaitPage
 from .models import Constants
 from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
 
-class MyPage(CustomMturkPage):
-    pass
+
 
 
 class ResultsWaitPage(CustomMturkWaitPage):
-    use_real_effort_task = True
+    use_task = True
     startwp_timer = 12
+    pay_by_task=2
     
     def after_all_players_arrive(self):
         pass
@@ -19,10 +19,14 @@ class ResultsWaitPage(CustomMturkWaitPage):
 class Results(CustomMturkPage):
     pass
 
+class FinalResults(Page):
+    # inherits only from Page not from CustomMturkPage: Will appear even to players who have hit the "finish study button"
+    pass
+
 
 page_sequence = [
-    MyPage,
     ResultsWaitPage,
     Results,
-    ResultsWaitPage,
+    FinalResults
+
 ]

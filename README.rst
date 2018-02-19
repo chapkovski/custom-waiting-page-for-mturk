@@ -35,7 +35,7 @@ You will also need to install radiogrid, which is used in one of the 2 tasks. Ty
 
 How to use it:
 ***************
-The CustomMturkWaitPage is an extension of a standard oTree WaitPage with the setting ``group_by_arrival_time = True``. Consequently, it must necessarily be the first page of an app. If you want to include a consent form before, you should put it in a first, separate app.
+The CustomMturkWaitPage is an extension of a standard oTree WaitPage with the setting ``group_by_arrival_time = True``. Consequently, it must necessarily be the first page of the page_sequence. If you want to include a consent form before, you should put it in a first, separate app.
 
 To include a CustomMturkWaitPage, just inherit your wait pages from CustomMturkWaitPage instead of the 'standard' oTree WaitPage::
 

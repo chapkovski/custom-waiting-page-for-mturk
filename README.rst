@@ -35,18 +35,22 @@ You will also need to install radiogrid, which is used in one of the 2 tasks. Ty
 
 How to use it:
 ***************
-To use the MTurk waiting page, just inherit your wait pages from CustomMturkWaitPage instead of the 'standard' oTree WaitPage::
+The CustomMturkWaitPage is an extension of a standard oTree WaitPage with the setting ``group_by_arrival_time = True``. Consequently, it must necessarily be the first page of an app. If you want to include a consent form before, you should put it in a first, separate app.
+
+To include a CustomMturkWaitPage, just inherit your wait pages from CustomMturkWaitPage instead of the 'standard' oTree WaitPage::
 
       from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
 
       class MyWaitPage(CustomMturkWaitPage):
            ...
 
-Also inherit your other "non-wait" pages from CustomMturkPage instead of Page (this is necessary to allow a participant to reach the end of the module or the end of the experiment if he has waited too much).
+Also inherit your other "non-wait pages" from CustomMturkPage instead of Page (this is necessary to allow a participant to reach the end of the module or the end of the experiment if he has waited too much).
+
+Other standard wait pages, not located at the first position of the app, should be declared as a WaitPage, as usual.
 
 The CustomMturkWaitPage has, in addition to standard properties of an oTree WaitPage (such as ``wait_for_all_groups`` or ``group_by_arrival_time``), six additional properties (see details in the section below):
 
-1. ``pay_by_task``: compensation (in points or dollars) for each task correctly submitted at the waiting page. Default value: ``0``.
+1. ``pay_by_task``: compensation (in points or dollars) for each task correctly submitted at the waiting page. Default value: ``0`` (Note that for now this is only implemented for the real effort task survey: if you want to include pay by answer for the survey, you should adapt the wait pages).
 
 2. ``pay_by_time``: compensation (in points or dollars) for each minute of waiting at the waiting page. Default value: ``0``.
 

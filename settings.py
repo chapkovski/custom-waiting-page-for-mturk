@@ -155,6 +155,12 @@ SESSION_CONFIGS = [
         'num_demo_participants': 6,
         'app_sequence': ['testapp2'],
     },
+    {
+        'name': 'testboth',
+        'display_name': "Testing both in a row",
+        'num_demo_participants': 6,
+        'app_sequence': ['testapp2','testapp'],
+    },
 
 ]
 

@@ -7,8 +7,9 @@ from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
 
 
 
-class ResultsWaitPage(CustomMturkWaitPage):
-    use_task = True
+class ResultsWaitPage(CustomMturkPage):
+# class ResultsWaitPage(CustomMturkWaitPage):
+    use_task = True #(by default task is real effort)
     startwp_timer = 12
     pay_by_task=2
     
@@ -19,14 +20,17 @@ class ResultsWaitPage(CustomMturkWaitPage):
 class Results(CustomMturkPage):
     pass
 
+
+# WARNING :: FinalResults inherits only from Page not from CustomMturkPage: Will appear even to players who have hit the "finish study button"
 class FinalResults(Page):
-    # inherits only from Page not from CustomMturkPage: Will appear even to players who have hit the "finish study button"
-    pass
+    def is_displayed(self):
+        return self.round_number == Constants.num_rounds
+
+   
 
 
 page_sequence = [
     ResultsWaitPage,
     Results,
     FinalResults
-
 ]

@@ -226,9 +226,7 @@ class CustomMturkWaitPage(WaitPage):
 
 
     def extra_task_to_decorate_end_of_get_players_for_group(self, waiting_players):
-        app_name = self.subsession._meta.app_label
-        if len(waiting_players) == get_models_module(app_name).Constants.players_per_group:
-            return waiting_players
+        pass
 
 
 

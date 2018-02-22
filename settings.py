@@ -146,7 +146,7 @@ SESSION_CONFIGS = [
     {
         'name': 'test',
         'display_name': "testing indep. app",
-        'num_demo_participants': 3,
+        'num_demo_participants': 9,
         'app_sequence': ['testapp'],
     },
     {

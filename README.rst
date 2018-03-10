@@ -6,16 +6,9 @@ This project is a collaboration between Essi Kujansuu (EUI), Nicolas Gruyer (`Ec
 
 Installation:
 ***************
-1. **Either**:
+1. Download the project and copy the ``otree_mturk_utils`` folder into your project folder, next to your app folders. 
 
-- type ``pip install mturkotreeutils`` in your terminal window.
-
-
-2. **or**:
-
--  clone exisiting project ``git clone https://github.com/chapkovski/custom-waiting-page-for-mturk`` and copy the ``otree_mturk_utils`` folder into your project folder, next to the apps of your module. 
-
-3. After that, add "otree_mturk_utils" to your INSTALLED_APPS section of ``settings.py`` file like this::
+2. After that, add "otree_mturk_utils" to your INSTALLED_APPS section of ``settings.py`` file like this::
 
     INSTALLED_APPS = [
         'otree',
@@ -23,19 +16,19 @@ Installation:
     ]
 You will also need to install radiogrid, which is used in one of the 2 tasks. Type ``pip install django-radiogrid`` in your terminal.
 
-4. If you use oTree version 2, add "otree_mturk_utils" to your EXTENSION_APPS section of ``settings.py`` file like this::
+3. If you use oTree version 2, add "otree_mturk_utils" to your EXTENSION_APPS section of ``settings.py`` file like this::
 
     EXTENSION_APPS  = [
         'otree_mturk_utils',
     ]
 
-5. In the ``views.py`` file of your project, import the pages::
+4. In the ``views.py`` file of your project, import the pages::
 
     from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
 
 How to use it:
 ***************
-The CustomMturkWaitPage is an extension of a standard oTree WaitPage with the setting ``group_by_arrival_time = True``. Consequently, it must necessarily be the first page of the page_sequence. If you want to include a consent form before, you should put it in a first, separate app.
+The CustomMturkWaitPage is an extension of a standard oTree WaitPage with the setting ``group_by_arrival_time = True``. Consequently, it must necessarily be the first page of the page_sequence of an app. If you want to include a consent form before, you should put it in a first, separate app.
 
 To include a CustomMturkWaitPage, just inherit your wait pages from CustomMturkWaitPage instead of the 'standard' oTree WaitPage::
 
@@ -84,10 +77,9 @@ task by setting the attributes pay_by_task and pay_by_time in your waitpage (by 
 The experimenter can also set a limit of time after which a player is offered to exit the study
 if he wants (by specifying the attribute “startwp_timer”, labelled in minutes, which is by default
 equal to 2 hours). A timer will appear on the waitpage to indicate how much longer the participant must wait before being able to exit the experiment (hidden if more than 30 minutes are left). By clicking on “finish the study”, the participant will skip
-all the CustomMturkPage and CustomMturkWaitPage pages in the remaining app sequence (if you want him to complete a survey
-in a final app, just do not inherit the survey pages from CustomMturkPage).
+all the CustomMturkPage and CustomMturkWaitPage pages in the rest of the round (if skip_until_the_end_of = 'round'), of the app (if skip_until_the_end_of = 'round'), or of the experiment (if skip_until_the_end_of = 'experiment'. In this case, just make sure that a CustomMturkWaitPage is also included at the start of each of the subsequent app that you want the participant to skip. Finally, if you want the participant to skip the whole experiment but to complete a survey in a final app, just do not inherit the survey pages from CustomMturkPage). I
 
-The page also displays the number of participants missing before a group can be formed (you might need to hide or adapt this if your grouping logic is complex).
+The CustomMturkWaitPage also displays the number of participants missing before a group can be formed (you might need to hide or adapt this if your grouping logic is complex).
 
 You will find two examples in the project (testapp and testapp2).
 

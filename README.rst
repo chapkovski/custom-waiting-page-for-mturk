@@ -81,7 +81,8 @@ all the CustomMturkPage and CustomMturkWaitPage pages in the rest of the round (
 
 The CustomMturkWaitPage also displays the number of participants missing before a group can be formed (you might need to hide or adapt this if your grouping logic is complex).
 
-You will find two examples in the project (testapp and testapp2).
+You will find two examples in the project (testapp and testapp2). **You will probably find it easier if you take a little time to really understand the "testboth" example, and perhaps "play" around it, changing parameters and adding pages, to see what happens, before applying the pages to your project.**
+
 
 Annex (more advanced): Transition at the end of the wait page, when groups are formed
 *************************************************************************************

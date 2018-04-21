@@ -1,0 +1,16 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    This page should only appear in the last round, to exiters
+{% endblock %}
+
+{% block content %}
+
+	<p>
+		    This page should only appear in the last round to participants who previously requested to exited the experiment (on a CustomMturkWaitPage with skip_until_the_end_of set to its default value, "experiment")
+	</p>
+
+    {% next_button %}
+
+{% endblock %}

@@ -28,14 +28,14 @@ class StandardNotCustomWaitPage(WaitPage):
 # WARNING :: This page is intended to be shown only to participants who previously requested to exit the experiment (on a CustomMturkWaitPage with
 # skip_until_the_end_of set to its default value, "experiment")
 class PageToShowOnlyToParticipantsWhoExitedTheExp(Page):
-       def is_displayed(self):
-        return self.round_number == Constants.num_rounds and self.player.participant.vars.get('go_to_the_end')
+	def is_displayed(self):
+		return self.round_number == Constants.num_rounds and self.player.participant.vars.get('go_to_the_end')
 
 # WARNING :: FinalResults inherits only from Page not from CustomMturkPage: Will appear even to players who have hit the "finish study button" on a CustomMturkWaitPage
 # skip_until_the_end_of
 class FinalResults(Page):
     def is_displayed(self):
-        return self.round_number == Constants.num_rounds
+    	return self.round_number == Constants.num_rounds
 
    
 

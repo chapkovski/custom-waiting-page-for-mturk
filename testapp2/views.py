@@ -9,7 +9,7 @@ from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
 
 class StartWP(CustomMturkWaitPage):
     use_task = True
-    task='survey' 
+    task='real_effort' 
     # pay_by_task = 1.5 # pay by task not implemented for answers to survey yet, but quite simple to adapt (by analogy with real effort task)
     startwp_timer = 12
     def is_displayed(self):

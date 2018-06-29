@@ -20,11 +20,14 @@ You will also need to install radiogrid, which is used in one of the 2 tasks. Ty
 
     EXTENSION_APPS  = [
         'otree_mturk_utils',
-    ]
+    ].
+
+You will also need to run the standard update process detailed in the `otree manual <https://otree.readthedocs.io/en/latest/misc/v20.html#updating-your-code>`_. If you want to run the 2 demo apps, you will also need to search for ``from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage`` in the pages/views files of the 2 apps and replace ``otree_mturk_utils.views`` with ``otree_mturk_utils.pages``.
 
 4. In the ``views.py`` file of your project, import the pages::
 
-    from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage
+    from otree_mturk_utils.views import CustomMturkPage, CustomMturkWaitPage 
+(or ``from otree_mturk_utils.pages import CustomMturkPage, CustomMturkWaitPage`` if you use otree 2)
 
 How to use it:
 ***************

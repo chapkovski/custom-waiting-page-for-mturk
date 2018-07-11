@@ -67,6 +67,8 @@ class CustomMturkWaitPage(WaitPage):
 
     group_by_arrival_time = True
 
+    max_payment_for_the_page = None
+
 
     def set_waiting_page_payoff(self, p):
         p.participant.vars.setdefault('ending_time_stamp_{}'.format(self._index_in_pages), time.time())
@@ -85,7 +87,11 @@ class CustomMturkWaitPage(WaitPage):
         except ObjectDoesNotExist:
             pass
 
-        p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait',0) + correct_tasks * self.pay_by_task + current_paying_time * self.pay_by_time
+        payment_to_add = correct_tasks * self.pay_by_task + current_paying_time * self.pay_by_time
+        if self.max_payment_for_the_page:
+            payment_to_add = min(self.max_payment_for_the_page, payment_to_add)
+
+        p.participant.vars['payment_for_wait'] = p.participant.vars.get('payment_for_wait',0) + payment_to_add
    
 
     def dispatch(self, *args, **kwargs):

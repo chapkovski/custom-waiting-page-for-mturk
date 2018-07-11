@@ -50,13 +50,15 @@ The CustomMturkWaitPage has, in addition to standard properties of an oTree Wait
 
 2. ``pay_by_time``: compensation (in points or dollars) for each minute of waiting at the waiting page. Default value: ``0``.
 
-3. ``startwp_timer``: After how long will the participant be offered to quit the study (in seconds). Default value: ``7200``.
+3. ``max_payment_for_the_page``: Maximum compensation (in points or dollars) for the page. Default value: ``None``.
 
-4. ``task``: What kind of activity a person can do while waiting. Right now there are two options: filling in a 'Big Five' questionnaire and a real effort task (finding sum of two maximum numbers). In the future we will add games as an option (tic tac toe, snake, hangman etc.) . Possible values now: ``['survey', 'real_effort']``. Default value: ``real_effort`` . (Note: The 'survey' task might need to be adapted if you use oTree 2+, in order to remove radiogrid)'
+4. ``startwp_timer``: After how long will the participant be offered to quit the study (in seconds). Default value: ``7200``.
 
-5. ``use_task``: whether the participant will see any kind of tasks while waiting. Default value: ``True``.
+5. ``task``: What kind of activity a person can do while waiting. Right now there are two options: filling in a 'Big Five' questionnaire and a real effort task (finding sum of two maximum numbers). In the future we will add games as an option (tic tac toe, snake, hangman etc.) . Possible values now: ``['survey', 'real_effort']``. Default value: ``real_effort`` . (Note: The 'survey' task might need to be adapted if you use oTree 2+, in order to remove radiogrid)'
 
-6. ``skip_until_the_end_of`` : whether participants who ask to stop waiting, should skip the whole experiment or only the current app, or only the current round (also remember that participants will not skip pages that do not inherit from CustomMturkPage, whatever the value of this attribute. The will skip standard Wait Pages if they are located in the same app). Default value: ``experiment`` . Other possible values: ``app`` and ``round``. (Note, in case you have several apps in the sequence and want to allow a participant to skip everything until the end of the experiment: once you have included a CustomMturkWaitPage in an app, you might have to also add a CustomMturkWaitPage at the start of the following apps).
+6. ``use_task``: whether the participant will see any kind of tasks while waiting. Default value: ``True``.
+
+7. ``skip_until_the_end_of`` : whether participants who ask to stop waiting, should skip the whole experiment or only the current app, or only the current round (also remember that participants will not skip pages that do not inherit from CustomMturkPage, whatever the value of this attribute. The will skip standard Wait Pages if they are located in the same app). Default value: ``experiment`` . Other possible values: ``app`` and ``round``. (Note, in case you have several apps in the sequence and want to allow a participant to skip everything until the end of the experiment: once you have included a CustomMturkWaitPage in an app, you might have to also add a CustomMturkWaitPage at the start of the following apps).
 
 
 What does the default Custom MTurk Wait Page do?

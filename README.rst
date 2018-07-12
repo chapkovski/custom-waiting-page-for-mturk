@@ -48,7 +48,7 @@ The CustomMturkWaitPage has, in addition to standard properties of an oTree Wait
 
 1. ``pay_by_task``: compensation (in points or dollars) for each task correctly submitted at the waiting page. Default value: ``0`` (Note that for now this is only implemented for the real effort task survey: if you want to include pay by answer for the survey, you should adapt the wait pages).
 
-2. ``pay_by_time``: compensation (in points or dollars) for each minute of waiting at the waiting page. Default value: ``0``.
+2. ``pay_by_time``: compensation (in points or dollars) for each second of waiting at the waiting page. Default value: ``0``.
 
 3. ``max_payment_for_the_page``: Maximum compensation (in points or dollars) for the page. Default value: ``None``.
 

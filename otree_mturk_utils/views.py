@@ -19,25 +19,20 @@ class BigFiveForm(ModelForm):
 
 class DecorateIsDisplayMixin(object):
 
-    def extra_task_to_execute_with_is_display(self):
-        pass
-
     def __init__(self):
         super(DecorateIsDisplayMixin, self).__init__()
 
         # We need to edit is_displayed() method dynamically, when creating an instance, since custom use is that it is overriden in the last child
         def decorate_is_displayed(func):
             def decorated_is_display(*args, **kwargs):
-                game_condition = func(*args, **kwargs)
-                # we need to first run them both separately to make sure that both conditions are executed
-                self.extra_task_to_execute_with_is_display()
-
                 app_name = self.player._meta.app_label
                 round_number = self.player.round_number
-                return game_condition and not self.player.participant.vars.get('go_to_the_end',
-                                                                               False) and not self.player.participant.vars.get('skip_the_end_of_app_{}'.format(app_name),
-                                                                               False) and not self.player.participant.vars.get('skip_the_end_of_app_{}_round_{}'.format(app_name , round_number),
-                                                                               False) 
+                exiter = self.player.participant.vars.get('go_to_the_end', False) or self.player.participant.vars.get('skip_the_end_of_app_{}'.format(app_name), False) or  self.player.participant.vars.get('skip_the_end_of_app_{}_round_{}'.format(app_name , round_number), False)
+
+                game_condition = func(*args, **kwargs)
+                # we need to first run them both separately to make sure that both conditions are executed
+                
+                return game_condition and not exiter 
 
             return decorated_is_display
 
@@ -99,8 +94,12 @@ class CustomMturkWaitPage(WaitPage):
         curparticipant = Participant.objects.get(code__exact=kwargs['participant_code'])
 
         if self.request.method == 'POST':
+            app_name = curparticipant._current_app_name
+            index_in_pages = curparticipant._index_in_pages
             now = time.time()
-            time_left = curparticipant.vars.get("startwp_time", 0) + self.startwp_timer - now
+            wptimerecord = models.WPTimeRecord.objects.get(app=app_name , page_index=index_in_pages, mturker_id = curparticipant.id)
+            time_left = wptimerecord.startwp_time + self.startwp_timer - now
+
             if time_left > 0:
                 url_should_be_on = curparticipant._url_i_should_be_on()
                 return HttpResponseRedirect(url_should_be_on)
@@ -251,6 +250,20 @@ class CustomMturkWaitPage(WaitPage):
             for p in players:
                 self.set_waiting_page_payoff(p)
 
+        # It is theoretically possible to have a participant with "go_to_the_end" and also inside a "normal" group with more than one player... This can happen because 
+        # "go_to_the_end" is set outside of the group-by-arrival-time lock (and the lock veries depending on the version of oTree so we can not
+        # easily fix this), but should be very rare, just when a participant requests exits right at the moment when he is grouped and if we have no luck...
+        # To fix this, we use a dirty hack here... we detect this anomaly with this test
+        if len(players) > 1:
+            app_name = players[0]._meta.app_label
+            round_number =  players[0].round_number
+            for p in players:
+                exiter = p.participant.vars.get('go_to_the_end', False) or p.participant.vars.get('skip_the_end_of_app_{}'.format(app_name), False) or  p.participant.vars.get('skip_the_end_of_app_{}_round_{}'.format(app_name , round_number), False)
+                if exiter:
+                    # --> fix the error, remove the exit marker
+                    p.participant.vars.pop('go_to_the_end', None)
+                    p.participant.vars.pop('skip_the_end_of_app_{}'.format(app_name), None)
+                    p.participant.vars.pop('skip_the_end_of_app_{}_round_{}'.format(app_name , round_number), None)
 
     def extra_task_to_execute_with_is_display(self):
         self.participant.vars.setdefault('starting_time_stamp_{}'.format(self._index_in_pages), time.time())

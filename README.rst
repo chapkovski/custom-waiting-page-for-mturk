@@ -4,6 +4,11 @@ Custom Waiting Page for mTurk experiments with oTree
 
 This project is a collaboration between Essi Kujansuu (EUI), Nicolas Gruyer (`Economics Games <https://economics-games.com>`_) and Philipp Chapkovski (UZH).
 
+
+This code has been tested and seems to work fine with with oTree between 1.4.2 and 2.1.9 (after adaptiong the code, if oTree 2). It has not been tested with other versions.
+Also, Be careful, it is easy to create problems if you do not set the right parameters for the page. I would advise you to not depart from very standard uses (cf examples that are provided) unless you understand how the code of the page works. 
+
+
 Installation:
 ***************
 1. Download the project and copy the ``otree_mturk_utils`` folder into your project folder, next to your app folders. 
@@ -118,6 +123,7 @@ and the redirection is delayed by 10s (10 000 ms):
     }, 10000);
     
 instead of just ``window.location.href = '{{ view.redirect_url|safe }}';``
+
 
 
 

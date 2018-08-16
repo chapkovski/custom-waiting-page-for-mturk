@@ -57,7 +57,8 @@ def send_message(message, app_name, group_pk, gbat, index_in_pages):
         "how_many_arrived": how_many_arrived,
         "left_to_wait": left_to_wait,
     })
-    Group('group_{}'.format(group_pk)).send({
+
+    Group('group_{}_{}'.format(app_name, group_pk)).send({
         "text": textforgroup,
     })
 
@@ -79,7 +80,7 @@ def ws_connect(message, participant_code, app_name, group_pk, player_pk, index_i
     new_task['tasks_attempted'] = wprecord.tasks_attempted
     message.reply_channel.send({'text': json.dumps(new_task)})
 
-    Group('group_{}'.format(group_pk)).add(message.reply_channel)
+    Group('group_{}_{}'.format(app_name, group_pk)).add(message.reply_channel)
     send_message(message, app_name, group_pk, gbat, index_in_pages)
 
 
@@ -120,8 +121,8 @@ def ws_disconnect(message, participant_code, app_name, group_pk, player_pk, inde
 
     mturker.current_wp = None
     mturker.save()
-    print('somebody disconnected...')
-    Group('group_{}'.format(group_pk)).discard(message.reply_channel)
+    print('somebody disconnected...') 
+    Group('group_{}_{}'.format(app_name, group_pk)).discard(message.reply_channel)
     send_message(message, app_name, group_pk, gbat, index_in_pages)
 
 

@@ -5,7 +5,7 @@ Custom Waiting Page for mTurk experiments with oTree
 This project is a collaboration between Essi Kujansuu (EUI), Nicolas Gruyer (`Economics Games <https://economics-games.com>`_) and Philipp Chapkovski (UZH).
 
 
-This code has been tested and seems to work fine with with oTree 1.4.2 and 2.1.9 (after adaptiong the code, if oTree 2). It has not been tested with other versions.
+This code has been tested and seems to work fine with with oTree 1.4.2 and 2.1.9 (after adaptiong the code, if oTree 2). It does not work with oTree 2.3+ (you would need to adapt our code to the "new" channels format, as explained `on this page <https://otree.readthedocs.io/en/latest/misc/django.html#real-time-and-websockets>`_). It has not been tested with other versions.
 
 Note : Be careful, if you use the CustomMturkWaitPage in an elaborate experiment, with a sequence of several apps and/or a complex grouping logic. 
 It can be used in these situations, but this is less easy and would probably require that you understand how the code of page works (how it sets exiters, how it allows exiters to go through "standard" pages...). Otherwise, I would advise you to not depart from standard uses (cf. examples that are provided). 

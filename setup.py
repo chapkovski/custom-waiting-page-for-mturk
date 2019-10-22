@@ -42,7 +42,7 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires=[
-        'Django==1.8.8',
+        'Django==1.11.23',
         'otree-core>=1.4.6',
         'django-radiogrid'
     ]
